@@ -54,6 +54,11 @@ import LegalLayout from '../layouts/LegalLayout.astro';
 		</div>
 	</div>
 
+	<!-- Print container - only visible during print -->
+	<div class="page-container theme-default">
+		<article id="print-article"></article>
+	</div>
+
 	<style>
 		/* Editor specific styles - will not be printed */
 		.editor-interface {
@@ -214,19 +219,20 @@ import LegalLayout from '../layouts/LegalLayout.astro';
 		}
 	</style>
 
-	<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-	<script is:inline>
-		const input = document.getElementById('markdown-input');
-		const preview = document.getElementById('legal-preview-container');
-		const printBtn = document.getElementById('print-btn');
-		const clearBtn = document.getElementById('clear-btn');
-		const uploadBtn = document.getElementById('upload-btn');
-		const fileInput = document.getElementById('file-upload');
-		const templateSelect = document.getElementById('template-select');
-		const themeSelect = document.getElementById('theme-select');
+	<script>
+		import { marked } from 'marked';
+
+		const input = document.getElementById('markdown-input') as HTMLTextAreaElement;
+		const preview = document.getElementById('legal-preview-container') as HTMLDivElement;
+		const printBtn = document.getElementById('print-btn') as HTMLButtonElement;
+		const clearBtn = document.getElementById('clear-btn') as HTMLButtonElement;
+		const uploadBtn = document.getElementById('upload-btn') as HTMLButtonElement;
+		const fileInput = document.getElementById('file-upload') as HTMLInputElement;
+		const templateSelect = document.getElementById('template-select') as HTMLSelectElement;
+		const themeSelect = document.getElementById('theme-select') as HTMLSelectElement;
 
 		// Handle Theme Change
-		themeSelect.addEventListener('change', (e) => {
+		themeSelect.addEventListener('change', (e: any) => {
 			const theme = e.target.value;
 			
 			// Apply to preview
@@ -243,12 +249,12 @@ import LegalLayout from '../layouts/LegalLayout.astro';
 
 		// Handle Upload
 		uploadBtn.addEventListener('click', () => fileInput.click());
-		fileInput.addEventListener('change', (e) => {
+		fileInput.addEventListener('change', (e: any) => {
 			const file = e.target.files[0];
 			if (!file) return;
 			
 			const reader = new FileReader();
-			reader.onload = (e) => {
+			reader.onload = (e: any) => {
 				input.value = e.target.result;
 				updatePreview();
 			};
@@ -256,7 +262,7 @@ import LegalLayout from '../layouts/LegalLayout.astro';
 		});
 
 		// Handle Drag & Drop
-		const editorPane = document.querySelector('.editor-pane');
+		const editorPane = document.querySelector('.editor-pane') as HTMLDivElement;
 		editorPane.addEventListener('dragover', (e) => {
 			e.preventDefault();
 			editorPane.style.background = '#f0f7ff';
@@ -264,13 +270,13 @@ import LegalLayout from '../layouts/LegalLayout.astro';
 		editorPane.addEventListener('dragleave', () => {
 			editorPane.style.background = 'white';
 		});
-		editorPane.addEventListener('drop', (e) => {
+		editorPane.addEventListener('drop', (e: any) => {
 			e.preventDefault();
 			editorPane.style.background = 'white';
 			const file = e.dataTransfer.files[0];
 			if (file) {
 				const reader = new FileReader();
-				reader.onload = (e) => {
+				reader.onload = (e: any) => {
 					input.value = e.target.result;
 					updatePreview();
 				};
@@ -279,19 +285,19 @@ import LegalLayout from '../layouts/LegalLayout.astro';
 		});
 
 		// Set options for marked
-		marked.setOptions({
+		marked.use({
 			breaks: true,
 			gfm: true
 		});
 
-		function updatePreview() {
+		async function updatePreview() {
 			const rawValue = input.value;
 			if (!rawValue.trim()) {
 				preview.innerHTML = '<div class="placeholder-msg"><p>O resultado da formatação jurídica aparecerá aqui em tempo real.</p></div>';
 				return;
 			}
 			
-			const htmlContent = marked.parse(rawValue);
+			const htmlContent = await marked.parse(rawValue);
 			preview.innerHTML = `<article class="petition-content">${htmlContent}</article>`;
 			
 			// Auto-save to local storage
@@ -300,11 +306,11 @@ import LegalLayout from '../layouts/LegalLayout.astro';
 
 		input.addEventListener('input', updatePreview);
 
-		printBtn.addEventListener('click', () => {
-			// Copy content to the hidden print container (from Layout)
-			const printArticle = document.querySelector('.page-container article');
+		printBtn.addEventListener('click', async () => {
+			// Copy content to the hidden print container
+			const printArticle = document.getElementById('print-article');
 			if (printArticle) {
-				printArticle.innerHTML = marked.parse(input.value);
+				printArticle.innerHTML = await marked.parse(input.value);
 			}
 			window.print();
 		});
@@ -317,29 +323,45 @@ import LegalLayout from '../layouts/LegalLayout.astro';
 		});
 
 		// Templates
-		const templates = {
+		const templates: Record<string, string> = {
 			apelacao: `# EXCELENTÍSSIMO SENHOR DOUTOR JUIZ DE DIREITO DA...
 
-Autos nº ...
-Apelante: ...
-Apelado: ...
+Autos nº 0001234-56.2024.8.22.0001
+Apelante: [NOME DO APELANTE]
+Apelado: [NOME DO APELADO]
 
-O **[NOME DA PARTE]**, vem interpor
+O **[NOME DA PARTE]**, já qualificado nos autos em epígrafe, vem, por intermédio de seu advogado, interpor
 
 **APELAÇÃO**
 
-pelas razões anexas.
+em face da r. sentença de fls., requerendo sua remessa ao Egrégio Tribunal de Justiça, pelas razões anexas.
 
 ---
 
 ## RAZÕES RECURSAIS
 
-Egrégio Tribunal, Colenda Câmara...
+**Egrégio Tribunal,**
+**Colenda Câmara,**
+**Ínclitos Desembargadores.**
 
-## I. Do Cabimento
-Texto sobre cabimento...
+### I. BREVE SÍNTESE DO PROCESSO
+A presente demanda versa sobre... (Texto longo para demonstrar a primeira página).
 
-> "Citação jurídica de exemplo para destacar no formato de bloco."`,
+### II. DO CABIMENTO E TEMPESTIVIDADE
+O presente recurso é cabível vez que a decisão foi publicada em...
+
+---
+
+### III. DO MÉRITO
+O apelante busca a reforma da decisão pois houve erro in procedendo...
+
+> "A justiça atrasada não é justiça; senão injustiça qualificada e manifesta." - Rui Barbosa.
+
+### IV. DOS PEDIDOS
+Ante o exposto, requer o conhecimento e provimento do recurso para reformar a decisão recorrida.
+
+Local, Data.
+Advogado / OAB`,
 			contestacao: `# EXCELENTÍSSIMO SENHOR DOUTOR JUIZ...
 
 CONTESTAÇÃO...`

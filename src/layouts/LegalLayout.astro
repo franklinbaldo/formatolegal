@@ -5,7 +5,7 @@ const { title } = Astro.props;
 <html lang="pt-br">
 	<head>
 		<meta charset="utf-8" />
-		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+		<link rel="icon" type="image/svg+xml" href={`${import.meta.env.BASE_URL}/favicon.svg`} />
 		<meta name="viewport" content="width=device-width" />
 		<meta name="generator" content={Astro.generator} />
 		<title>{title || "Petição de Apelação"}</title>
@@ -208,10 +208,6 @@ const { title } = Astro.props;
 		</style>
 	</head>
 	<body>
-		<div class="page-container">
-			<article>
-				<slot />
-			</article>
-		</div>
+		<slot />
 	</body>
 </html>
