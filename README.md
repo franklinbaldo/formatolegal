@@ -1,43 +1,35 @@
-# Astro Starter Kit: Minimal
+# ⚖️ Formato Legal
 
-```sh
-npm create astro@latest -- --template minimal
-```
+**Formato Legal** é uma ferramenta web moderna projetada para advogados e profissionais do direito que desejam transformar petições em Markdown ou HTML em documentos jurídicos impecavelmente formatados no padrão A4.
 
-> 🧑‍🚀 **Seasoned astronaut?** Delete this file. Have fun!
+🚀 **Acesse agora:** [https://franklinbaldo.github.io/formatolegal/](https://franklinbaldo.github.io/formatolegal/)
 
-## 🚀 Project Structure
+## ✨ Funcionalidades
 
-Inside of your Astro project, you'll see the following folders and files:
+- **Editor em Tempo Real**: Cole seu texto ou Markdown à esquerda e veja a formatação jurídica aplicada instantaneamente à direita.
+- **Identidade Jurídica**: Formatação automática com fontes elegantes (Lora e Montserrat), margens A4 precisas (30mm/20mm), recuo de parágrafo e citações destacadas.
+- **Múltiplas Formas de Input**:
+  - **Copiar e Colar**: Simples e direto.
+  - **Upload de Arquivo**: Botão dedicado para carregar arquivos `.md` ou `.txt`.
+  - **Drag & Drop**: Arraste seu arquivo diretamente para o editor.
+- **Impressão Profissional**: Botão dedicado para gerar o PDF final otimizado para impressão em papel A4.
+- **Templates**: Modelos pré-carregados para acelerar a redação (Apelação, Contestação, etc).
+- **Privacidade**: Todo o processamento ocorre localmente no seu navegador. Nenhum conteúdo de petição é enviado ou armazenado em servidores.
 
-```text
-/
-├── public/
-├── src/
-│   └── pages/
-│       └── index.astro
-└── package.json
-```
+## 🛠️ Tecnologias
 
-Astro looks for `.astro` or `.md` files in the `src/pages/` directory. Each page is exposed as a route based on its file name.
+- [Astro](https://astro.build/) - Framework web para alta performance.
+- [Marked.js](https://marked.js.org/) - Compilador de Markdown ultra-rápido.
+- [Google Fonts](https://fonts.google.com/) - Tipografia premium (Lora & Montserrat).
+- [GitHub Actions](https://github.com/features/actions) - Deploy automatizado.
 
-There's nothing special about `src/components/`, but that's where we like to put any Astro/React/Vue/Svelte/Preact components.
+## 📖 Como usar
 
-Any static assets, like images, can be placed in the `public/` directory.
+1. Acesse o site oficial.
+2. Digite ou cole sua petição usando a sintaxe Markdown (ou HTML).
+3. Utilize os `#` para títulos e `**` para negritos conforme necessário.
+4. Visualize o resultado no "papel" virtual à direita.
+5. Clique em **Imprimir PDF** para salvar ou imprimir o documento final.
 
-## 🧞 Commands
-
-All commands are run from the root of the project, from a terminal:
-
-| Command                   | Action                                           |
-| :------------------------ | :----------------------------------------------- |
-| `npm install`             | Installs dependencies                            |
-| `npm run dev`             | Starts local dev server at `localhost:4321`      |
-| `npm run build`           | Build your production site to `./dist/`          |
-| `npm run preview`         | Preview your build locally, before deploying     |
-| `npm run astro ...`       | Run CLI commands like `astro add`, `astro check` |
-| `npm run astro -- --help` | Get help using the Astro CLI                     |
-
-## 👀 Want to learn more?
-
-Feel free to check [our documentation](https://docs.astro.build) or jump into our [Discord server](https://astro.build/chat).
+---
+Desenvolvido por [Franklin Baldo](https://github.com/franklinbaldo)
