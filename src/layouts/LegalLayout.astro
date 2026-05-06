@@ -1,0 +1,187 @@
+---
+const { title } = Astro.props;
+---
+
+<html lang="pt-br">
+	<head>
+		<meta charset="utf-8" />
+		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+		<meta name="viewport" content="width=device-width" />
+		<meta name="generator" content={Astro.generator} />
+		<title>{title || "Petição de Apelação"}</title>
+		<link rel="preconnect" href="https://fonts.googleapis.com">
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+		<link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400..700;1,400..700&family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
+		<style is:global>
+			:root {
+				--paper-width: 210mm;
+				--paper-height: 297mm;
+				--margin-top: 30mm;
+				--margin-bottom: 25mm;
+				--margin-left: 30mm;
+				--margin-right: 20mm;
+				--primary-color: #1a2a44;
+			}
+
+			body {
+				background-color: #f0f2f5;
+				margin: 0;
+				padding: 40px 0;
+				font-family: 'Lora', serif;
+				color: #333;
+				line-height: 1.6;
+			}
+
+			.page-container {
+				width: var(--paper-width);
+				min-height: var(--paper-height);
+				background: white;
+				margin: 0 auto;
+				padding: var(--margin-top) var(--margin-right) var(--margin-bottom) var(--margin-left);
+				box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+				box-sizing: border-box;
+				position: relative;
+			}
+
+			/* Timbre / Header style */
+			.header-stamp {
+				border-bottom: 2px solid var(--primary-color);
+				margin-bottom: 40px;
+				padding-bottom: 10px;
+				display: flex;
+				justify-content: space-between;
+				align-items: flex-end;
+			}
+
+			.header-stamp h1 {
+				margin: 0;
+				font-family: 'Montserrat', sans-serif;
+				font-size: 14px;
+				text-transform: uppercase;
+				letter-spacing: 2px;
+				color: var(--primary-color);
+			}
+
+			.header-stamp span {
+				font-size: 12px;
+				color: #666;
+			}
+
+			/* Typography for the petition */
+			article {
+				text-align: justify;
+				hyphens: auto;
+			}
+
+			h1, h2, h3, h4 {
+				font-family: 'Montserrat', sans-serif;
+				color: var(--primary-color);
+				margin-top: 2em;
+				margin-bottom: 1em;
+			}
+
+			h2 { 
+				border-left: 4px solid var(--primary-color);
+				padding-left: 15px;
+				font-size: 1.5rem;
+				text-transform: uppercase;
+			}
+
+			h3 {
+				font-size: 1.2rem;
+				font-weight: 700;
+				color: #444;
+			}
+
+			p {
+				margin-bottom: 1.5em;
+				text-indent: 2em;
+			}
+
+			strong {
+				font-weight: 700;
+			}
+
+			blockquote {
+				margin: 1.5em 3em;
+				font-size: 0.95em;
+				color: #555;
+				border-left: 2px solid #ddd;
+				padding-left: 1.5em;
+				text-align: justify;
+			}
+
+			ul, ol {
+				margin-bottom: 1.5em;
+				padding-left: 3em;
+			}
+
+			li {
+				margin-bottom: 0.5em;
+			}
+
+			/* Footer signature area */
+			.footer-signature {
+				margin-top: 60px;
+				text-align: center;
+			}
+
+			hr {
+				border: none;
+				border-top: 1px solid #eee;
+				margin: 40px 0;
+			}
+
+			@media print {
+				body {
+					background: white;
+					padding: 0;
+				}
+				.page-container {
+					box-shadow: none;
+					margin: 0;
+					width: 100%;
+				}
+			}
+
+			hr {
+				border: none;
+				border-top: 1px dashed #ccc;
+				margin: 60px 0;
+				page-break-before: always;
+				position: relative;
+				height: 0;
+				overflow: visible;
+			}
+
+			hr::after {
+				content: "QUEBRA DE PÁGINA";
+				position: absolute;
+				top: -10px;
+				right: 0;
+				font-family: 'Montserrat', sans-serif;
+				font-size: 10px;
+				color: #999;
+				background: white;
+				padding: 0 10px;
+			}
+
+			@media print {
+				hr {
+					border: none;
+					margin: 0;
+				}
+				hr::after {
+					display: none;
+				}
+			}
+		</style>
+	</head>
+	<body>
+		<div class="page-container">
+			<article>
+				<slot />
+			</article>
+		</div>
+	</body>
+</html>
