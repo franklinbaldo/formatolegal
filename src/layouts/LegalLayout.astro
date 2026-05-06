@@ -132,15 +132,45 @@ const { title } = Astro.props;
 				margin: 40px 0;
 			}
 
+			/* THEMES */
+			.theme-classic {
+				font-family: 'Times New Roman', Times, serif;
+			}
+			.theme-classic h1, .theme-classic h2, .theme-classic h3 {
+				font-family: 'Times New Roman', Times, serif;
+				text-transform: uppercase;
+				border-bottom: 1px solid #333;
+			}
+
+			.theme-modern {
+				font-family: 'Montserrat', sans-serif;
+				line-height: 1.5;
+			}
+			.theme-modern h2 {
+				border-left: 8px solid var(--primary-color);
+				background: #f8f9fa;
+				padding: 10px 20px;
+			}
+
+			.theme-minimal {
+				font-family: 'Lora', serif;
+			}
+			.theme-minimal h2 {
+				border: none;
+				padding: 0;
+				text-decoration: underline;
+				text-underline-offset: 8px;
+			}
+
 			@media print {
 				body {
-					background: white;
-					padding: 0;
+					background: white !important;
+					padding: 0 !important;
 				}
 				.page-container {
-					box-shadow: none;
-					margin: 0;
-					width: 100%;
+					box-shadow: none !important;
+					margin: 0 !important;
+					width: 100% !important;
 				}
 			}
 

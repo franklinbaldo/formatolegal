@@ -10,6 +10,16 @@ import LegalLayout from '../layouts/LegalLayout.astro';
 				<h1>Formato Legal</h1>
 			</div>
 			<div class="actions">
+				<div class="theme-selector">
+					<select id="theme-select">
+						<option value="theme-default">Padrão (Lora/Mont)</option>
+						<option value="theme-classic">Clássico (Times)</option>
+						<option value="theme-modern">Moderno (Sans)</option>
+						<option value="theme-minimal">Minimalista</option>
+					</select>
+				</div>
+				<input type="file" id="file-upload" accept=".md,.txt,.html" style="display: none;" />
+				<button id="upload-btn" class="secondary">Subir Arquivo</button>
 				<button id="clear-btn" class="secondary">Limpar</button>
 				<button id="print-btn" class="primary">Imprimir PDF</button>
 			</div>
@@ -210,7 +220,63 @@ import LegalLayout from '../layouts/LegalLayout.astro';
 		const preview = document.getElementById('legal-preview-container');
 		const printBtn = document.getElementById('print-btn');
 		const clearBtn = document.getElementById('clear-btn');
+		const uploadBtn = document.getElementById('upload-btn');
+		const fileInput = document.getElementById('file-upload');
 		const templateSelect = document.getElementById('template-select');
+		const themeSelect = document.getElementById('theme-select');
+
+		// Handle Theme Change
+		themeSelect.addEventListener('change', (e) => {
+			const theme = e.target.value;
+			
+			// Apply to preview
+			preview.className = 'legal-paper ' + theme;
+			
+			// Apply to print container (Layout)
+			const pageContainer = document.querySelector('.page-container');
+			if (pageContainer) {
+				pageContainer.className = 'page-container ' + theme;
+			}
+			
+			localStorage.setItem('formatolegal_theme', theme);
+		});
+
+		// Handle Upload
+		uploadBtn.addEventListener('click', () => fileInput.click());
+		fileInput.addEventListener('change', (e) => {
+			const file = e.target.files[0];
+			if (!file) return;
+			
+			const reader = new FileReader();
+			reader.onload = (e) => {
+				input.value = e.target.result;
+				updatePreview();
+			};
+			reader.readAsText(file);
+		});
+
+		// Handle Drag & Drop
+		const editorPane = document.querySelector('.editor-pane');
+		editorPane.addEventListener('dragover', (e) => {
+			e.preventDefault();
+			editorPane.style.background = '#f0f7ff';
+		});
+		editorPane.addEventListener('dragleave', () => {
+			editorPane.style.background = 'white';
+		});
+		editorPane.addEventListener('drop', (e) => {
+			e.preventDefault();
+			editorPane.style.background = 'white';
+			const file = e.dataTransfer.files[0];
+			if (file) {
+				const reader = new FileReader();
+				reader.onload = (e) => {
+					input.value = e.target.result;
+					updatePreview();
+				};
+				reader.readAsText(file);
+			}
+		});
 
 		// Set options for marked
 		marked.setOptions({
@@ -287,12 +353,18 @@ CONTESTAÇÃO...`
 			}
 		});
 
-		// Load saved content
+		// Load saved content and theme
 		window.addEventListener('load', () => {
-			const saved = localStorage.getItem('formatolegal_content');
-			if (saved) {
-				input.value = saved;
+			const savedContent = localStorage.getItem('formatolegal_content');
+			if (savedContent) {
+				input.value = savedContent;
 				updatePreview();
+			}
+
+			const savedTheme = localStorage.getItem('formatolegal_theme');
+			if (savedTheme) {
+				themeSelect.value = savedTheme;
+				themeSelect.dispatchEvent(new Event('change'));
 			}
 		});
 	</script>
