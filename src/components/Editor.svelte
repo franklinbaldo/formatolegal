@@ -12,7 +12,6 @@
 
 	let markdown = $state('');
 	let theme = $state<Theme>('theme-default');
-	let numberedParagraphs = $state(false);
 	let renderedHtml = $state('');
 	let mobileTab = $state<'editor' | 'preview'>('editor');
 	let dragOver = $state(false);
@@ -34,13 +33,14 @@
 			: `${wordCount} palavras · ~${pageCount} ${pageCount === 1 ? 'página' : 'páginas'}`,
 	);
 
+	const DARK_THEMES = new Set(['theme-cyberpunk']);
+	const paperDataTheme = $derived(DARK_THEMES.has(theme) ? 'dark' : 'light');
+
 	$effect(() => {
 		const saved = localStorage.getItem(STORAGE_KEYS.content);
 		if (saved) markdown = saved;
 		const savedTheme = localStorage.getItem(STORAGE_KEYS.theme);
 		if (savedTheme && isTheme(savedTheme)) theme = savedTheme;
-		const savedNumbered = localStorage.getItem(STORAGE_KEYS.numberedParagraphs);
-		if (savedNumbered === '1') numberedParagraphs = true;
 		hydrated = true;
 	});
 
@@ -50,10 +50,6 @@
 
 	$effect(() => {
 		localStorage.setItem(STORAGE_KEYS.theme, theme);
-	});
-
-	$effect(() => {
-		localStorage.setItem(STORAGE_KEYS.numberedParagraphs, numberedParagraphs ? '1' : '0');
 	});
 
 	$effect(() => {
@@ -160,17 +156,6 @@
 						{/each}
 					</select>
 				</li>
-				<li>
-					<label for="numbered-paragraphs" class="numbered-toggle">
-						<input
-							id="numbered-paragraphs"
-							type="checkbox"
-							role="switch"
-							bind:checked={numberedParagraphs}
-						/>
-						Numerar §
-					</label>
-				</li>
 			</ul>
 		</nav>
 		<nav aria-label="Ações do documento">
@@ -264,10 +249,16 @@
 			</header>
 			<textarea
 				id="markdown-input"
-				placeholder="Cole seu Markdown aqui…"
+				placeholder="Cole ou arraste um arquivo .md aqui…"
 				bind:value={markdown}
 				aria-label="Markdown source"
 			></textarea>
+		{#if dragOver}
+			<div class="drop-overlay" aria-hidden="true">
+				<span>📂</span>
+				<span>Solte o arquivo .md aqui</span>
+			</div>
+		{/if}
 		</section>
 
 		<section
@@ -285,7 +276,7 @@
 			<div
 				id="legal-preview-container"
 				class="legal-paper {theme}"
-				class:numbered-paragraphs={numberedParagraphs}
+				data-theme={paperDataTheme}
 				bind:this={previewEl}
 			>
 				{#if markdown.trim()}
@@ -301,7 +292,7 @@
 	</main>
 </div>
 
-<div class="page-container {theme}" class:numbered-paragraphs={numberedParagraphs}>
+<div class="page-container {theme}">
 	<!-- eslint-disable-next-line svelte/no-at-html-tags -- sanitized via DOMPurify in renderMarkdown -->
 	<article id="print-article">{@html printHtml}</article>
 </div>
@@ -377,19 +368,6 @@
 		white-space: nowrap;
 	}
 
-	.numbered-toggle {
-		display: inline-flex;
-		align-items: center;
-		gap: 0.4rem;
-		margin: 0;
-		font-size: 0.875rem;
-		white-space: nowrap;
-	}
-
-	.numbered-toggle :global(input) {
-		margin: 0;
-	}
-
 	.pane-tabs {
 		display: none;
 		border-bottom: 1px solid var(--pico-muted-border-color);
@@ -412,11 +390,28 @@
 		display: flex;
 		flex-direction: column;
 		border-right: 1px solid var(--pico-muted-border-color);
-		transition: background-color 0.15s;
+		position: relative;
 	}
 
-	.editor-pane.drag-over {
-		background: var(--pico-primary-background);
+	.drop-overlay {
+		position: absolute;
+		inset: 0;
+		background: color-mix(in srgb, var(--pico-primary) 12%, transparent);
+		border: 3px dashed var(--pico-primary);
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		justify-content: center;
+		gap: 0.5rem;
+		font-size: 2rem;
+		font-weight: 600;
+		color: var(--pico-primary);
+		pointer-events: none;
+		z-index: 10;
+	}
+
+	.drop-overlay span:last-child {
+		font-size: 1rem;
 	}
 
 	.preview-pane {

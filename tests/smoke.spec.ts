@@ -84,15 +84,6 @@ test('all fun themes are selectable', async ({ page }) => {
 	}
 });
 
-test('numbered paragraphs toggle adds class', async ({ page }) => {
-	await gotoReady(page);
-	await page.locator('#markdown-input').fill('Primeiro.\n\nSegundo.\n\nTerceiro.');
-	const preview = page.locator('#legal-preview-container');
-	await expect(preview).not.toHaveClass(/numbered-paragraphs/);
-	await page.locator('#numbered-paragraphs').check();
-	await expect(preview).toHaveClass(/numbered-paragraphs/);
-});
-
 test('footnotes render with refs and backref links', async ({ page }) => {
 	await gotoReady(page);
 	await page.locator('#markdown-input').fill(

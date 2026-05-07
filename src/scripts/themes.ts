@@ -31,7 +31,6 @@ export const THEME_LABELS: Record<Theme, string> = {
 export const STORAGE_KEYS = {
 	content: 'formatolegal_content',
 	theme: 'formatolegal_theme',
-	numberedParagraphs: 'formatolegal_numbered_paragraphs',
 } as const;
 
 export function isTheme(value: string): value is Theme {
