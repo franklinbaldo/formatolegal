@@ -91,23 +91,3 @@
 		<PreviewPane {htmlContent} {theme} />
 	</div>
 </div>
-
-<style>
-	.editor-interface {
-		display: flex;
-		flex-direction: column;
-		height: 100vh;
-		width: 100vw;
-		position: fixed;
-		top: 0;
-		left: 0;
-		background: #f8f9fa;
-		z-index: 1000;
-	}
-
-	.main-split {
-		display: flex;
-		flex: 1;
-		overflow: hidden;
-	}
-</style>

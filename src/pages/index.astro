@@ -11,23 +11,3 @@ import LegalEditor from '../components/LegalEditor.svelte';
 		<article id="print-article"></article>
 	</div>
 </LegalLayout>
-
-<style is:global>
-	/* Hide the default slot-based page-container from layout when in editor mode */
-	.page-container {
-		display: none;
-	}
-
-	@media print {
-		.no-print {
-			display: none !important;
-		}
-		.page-container {
-			display: block !important;
-		}
-		body {
-			background: white !important;
-			padding: 0 !important;
-		}
-	}
-</style>
