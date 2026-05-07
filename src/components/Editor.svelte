@@ -136,7 +136,7 @@
 	async function downloadHtml(): Promise<void> {
 		if (!markdown.trim()) return;
 		const html = await renderMarkdown(markdown);
-		const doc = buildStandaloneHtml(theme, html);
+		const doc = await buildStandaloneHtml(theme, html);
 		downloadBlob('peticao.html', new Blob([doc], { type: 'text/html' }));
 	}
 </script>
@@ -390,7 +390,8 @@
 	}
 
 	.legal-paper {
-		background: white;
+		background: var(--paper-bg, white);
+		color: var(--paper-color, #333);
 		width: var(--paper-width, 210mm);
 		min-height: var(--paper-height, 297mm);
 		padding: var(--margin-top, 30mm) var(--margin-right, 20mm) var(--margin-bottom, 25mm)

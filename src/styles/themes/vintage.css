@@ -1,0 +1,75 @@
+/* Manuscrito Vintage — papel sépia, EB Garamond, Cinzel small-caps, drop-cap. */
+.theme-vintage {
+	--margin-top: 35mm;
+	--margin-right: 25mm;
+	--margin-bottom: 30mm;
+	--margin-left: 25mm;
+	--paper-bg:
+		radial-gradient(ellipse at top left, rgba(180, 140, 80, 0.08), transparent 60%),
+		radial-gradient(ellipse at bottom right, rgba(140, 100, 50, 0.06), transparent 60%),
+		#f4ecd8;
+	--paper-color: #3a2a14;
+	color: var(--paper-color);
+	font-family: 'EB Garamond', 'Garamond', serif;
+	font-size: 13pt;
+	line-height: 1.7;
+}
+.theme-vintage h1,
+.theme-vintage h2,
+.theme-vintage h3 {
+	font-family: 'Cinzel', serif;
+	color: #5a3a1a;
+	text-align: center;
+	border: none;
+	padding: 0;
+	letter-spacing: 0.1em;
+}
+.theme-vintage h1 {
+	font-size: 1.6rem;
+	font-variant: small-caps;
+	margin-bottom: 0.2em;
+}
+.theme-vintage h1::after {
+	content: '✦  ✦  ✦';
+	display: block;
+	font-size: 0.7em;
+	color: #8a6a3a;
+	letter-spacing: 0.5em;
+	margin-top: 0.2em;
+}
+.theme-vintage h2 {
+	font-variant: small-caps;
+	font-size: 1.2rem;
+	border-bottom: 1px solid #b89a6a;
+	padding-bottom: 0.2em;
+}
+.theme-vintage article > p:first-of-type::first-letter {
+	font-family: 'Cinzel', serif;
+	font-size: 3.5em;
+	float: left;
+	line-height: 0.85;
+	margin: 0.05em 0.1em 0 0;
+	color: #6a3a1a;
+	font-weight: 700;
+}
+.theme-vintage blockquote {
+	border-left: 3px double #8a6a3a;
+	font-style: italic;
+	color: #5a4a2a;
+}
+.theme-vintage hr {
+	border: none;
+	text-align: center;
+	margin: 2em 0;
+	page-break-before: auto;
+	height: auto;
+}
+.theme-vintage hr::after {
+	content: '✦  ✧  ✦';
+	position: static;
+	background: transparent;
+	color: #8a6a3a;
+	font-size: 1.2em;
+	letter-spacing: 0.5em;
+	padding: 0;
+}

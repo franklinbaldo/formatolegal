@@ -1,0 +1,45 @@
+/* Contrato — Times 11, single-spaced; listas ordenadas como cláusulas hierárquicas */
+.theme-contrato {
+	--margin-top: 25mm;
+	--margin-right: 20mm;
+	--margin-bottom: 25mm;
+	--margin-left: 25mm;
+	font-family: 'Times New Roman', Times, serif;
+	font-size: 11pt;
+	line-height: 1.25;
+}
+.theme-contrato h1,
+.theme-contrato h2,
+.theme-contrato h3 {
+	font-family: 'Times New Roman', Times, serif;
+	color: #000;
+	border: none;
+	padding: 0;
+	font-weight: 700;
+	text-transform: uppercase;
+	font-size: 11pt;
+}
+.theme-contrato h1 {
+	text-align: center;
+	margin-bottom: 1.5em;
+}
+.theme-contrato p {
+	text-indent: 0;
+	margin-bottom: 0.75em;
+	text-align: justify;
+}
+.theme-contrato ol {
+	counter-reset: clause;
+	list-style: none;
+	padding-left: 0;
+}
+.theme-contrato ol > li {
+	counter-increment: clause;
+	margin-bottom: 0.5em;
+	text-align: justify;
+}
+.theme-contrato ol > li::before {
+	content: counters(clause, '.') '. ';
+	font-weight: 700;
+	margin-right: 0.25em;
+}

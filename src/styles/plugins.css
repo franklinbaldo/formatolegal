@@ -1,0 +1,126 @@
+/* === Mermaid === */
+.mermaid-diagram {
+	margin: 1.5em auto;
+	text-align: center;
+	max-width: 100%;
+	page-break-inside: avoid;
+}
+.mermaid-diagram svg {
+	max-width: 100%;
+	height: auto;
+}
+.mermaid-error {
+	background: #fff5f5;
+	border-left: 4px solid #c92a2a;
+	padding: 0.75em 1em;
+	color: #842029;
+	font-family: 'Fira Code', monospace;
+	font-size: 0.9em;
+	white-space: pre-wrap;
+}
+
+/* === GitHub-style alerts (marked-alert) === */
+.markdown-alert {
+	margin: 1em 0;
+	padding: 0.75em 1em;
+	border-left: 4px solid var(--alert-color, #888);
+	background: var(--alert-bg, #f6f8fa);
+	border-radius: 0 4px 4px 0;
+	text-indent: 0;
+}
+.markdown-alert > p {
+	text-indent: 0;
+	margin-bottom: 0.5em;
+}
+.markdown-alert > p:last-child {
+	margin-bottom: 0;
+}
+.markdown-alert-title {
+	font-weight: 700;
+	text-transform: uppercase;
+	font-size: 0.85em;
+	letter-spacing: 0.05em;
+	display: flex;
+	align-items: center;
+	gap: 0.4em;
+}
+.markdown-alert-note {
+	--alert-color: #0969da;
+	--alert-bg: #ddf4ff;
+}
+.markdown-alert-tip {
+	--alert-color: #1a7f37;
+	--alert-bg: #dcfce7;
+}
+.markdown-alert-important {
+	--alert-color: #8250df;
+	--alert-bg: #f3e8ff;
+}
+.markdown-alert-warning {
+	--alert-color: #bf8700;
+	--alert-bg: #fff8c5;
+}
+.markdown-alert-caution {
+	--alert-color: #cf222e;
+	--alert-bg: #ffebe9;
+}
+
+/* === Footnotes (marked-footnote) === */
+.footnotes {
+	margin-top: 3em;
+	padding-top: 1em;
+	border-top: 1px solid #ccc;
+	font-size: 0.9em;
+}
+.footnotes ol {
+	padding-left: 2em;
+}
+.footnotes li {
+	text-indent: 0;
+}
+[data-footnote-ref] {
+	font-size: 0.75em;
+	vertical-align: super;
+	text-decoration: none;
+}
+[data-footnote-backref] {
+	text-decoration: none;
+	margin-left: 0.3em;
+}
+
+/* === Code blocks (highlight.js) === */
+pre code.hljs {
+	display: block;
+	overflow-x: auto;
+	padding: 0.75em 1em;
+	border-radius: 4px;
+	font-size: 0.875em;
+	line-height: 1.5;
+}
+:not(pre) > code {
+	background: rgba(175, 184, 193, 0.2);
+	padding: 0.15em 0.35em;
+	border-radius: 3px;
+	font-size: 0.875em;
+	font-family: 'Fira Code', 'Cascadia Code', monospace;
+}
+
+/* === Task lists (GFM) === */
+.task-list-item {
+	list-style: none;
+	text-indent: 0;
+}
+.task-list-item input[type='checkbox'] {
+	margin-right: 0.5em;
+	transform: translateY(1px);
+}
+ul:has(> .task-list-item) {
+	padding-left: 1.5em;
+}
+
+/* === KaTeX adjustments === */
+.katex-display {
+	margin: 1em 0;
+	overflow-x: auto;
+	overflow-y: hidden;
+}

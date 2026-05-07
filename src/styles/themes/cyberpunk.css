@@ -1,0 +1,73 @@
+/* Cyberpunk Noturno — JetBrains Mono headings com glow neon, fundo dark. */
+.theme-cyberpunk {
+	--margin-top: 25mm;
+	--margin-right: 20mm;
+	--margin-bottom: 25mm;
+	--margin-left: 20mm;
+	--paper-bg: #0d0d12;
+	--paper-color: #e6e6f0;
+	color: var(--paper-color);
+	font-family: 'Inter', system-ui, sans-serif;
+	font-size: 11pt;
+	line-height: 1.65;
+}
+.theme-cyberpunk h1,
+.theme-cyberpunk h2,
+.theme-cyberpunk h3,
+.theme-cyberpunk h4 {
+	font-family: 'JetBrains Mono', ui-monospace, monospace;
+	color: #ff2b9d;
+	text-transform: uppercase;
+	letter-spacing: 0.05em;
+	border: none;
+	padding: 0;
+	text-shadow:
+		0 0 8px rgba(255, 43, 157, 0.6),
+		0 0 16px rgba(255, 43, 157, 0.3);
+}
+.theme-cyberpunk h1 {
+	font-size: 1.8rem;
+	border-bottom: 2px solid #ff2b9d;
+	padding-bottom: 0.3em;
+}
+.theme-cyberpunk h2 {
+	color: #00f0ff;
+	text-shadow:
+		0 0 8px rgba(0, 240, 255, 0.6),
+		0 0 16px rgba(0, 240, 255, 0.3);
+}
+.theme-cyberpunk h2::before {
+	content: '> ';
+	color: #ff2b9d;
+	text-shadow: 0 0 6px rgba(255, 43, 157, 0.7);
+}
+.theme-cyberpunk h3 {
+	color: #c5a8ff;
+	text-shadow: 0 0 6px rgba(197, 168, 255, 0.5);
+}
+.theme-cyberpunk strong {
+	color: #ffd166;
+}
+.theme-cyberpunk a {
+	color: #00f0ff;
+	text-shadow: 0 0 6px rgba(0, 240, 255, 0.5);
+}
+.theme-cyberpunk blockquote {
+	border-left: 3px solid #00f0ff;
+	background: rgba(0, 240, 255, 0.08);
+	color: #b9d9ff;
+	font-style: italic;
+	box-shadow: inset 0 0 20px rgba(0, 240, 255, 0.1);
+}
+.theme-cyberpunk code {
+	background: rgba(255, 43, 157, 0.15);
+	color: #ffd166;
+}
+.theme-cyberpunk hr {
+	border-top: 1px solid #ff2b9d;
+	box-shadow: 0 0 10px rgba(255, 43, 157, 0.6);
+}
+.theme-cyberpunk hr::after {
+	background: #0d0d12;
+	color: #00f0ff;
+}

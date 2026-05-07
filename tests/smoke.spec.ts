@@ -70,6 +70,20 @@ test('all BR-legal themes are selectable', async ({ page }) => {
 	}
 });
 
+test('all fun themes are selectable', async ({ page }) => {
+	await gotoReady(page);
+	for (const theme of [
+		'theme-cyberpunk',
+		'theme-vintage',
+		'theme-pastel',
+		'theme-brutalist',
+		'theme-festa',
+	]) {
+		await page.locator('#theme-select').selectOption(theme);
+		await expect(page.locator('#legal-preview-container')).toHaveClass(new RegExp(theme));
+	}
+});
+
 test('numbered paragraphs toggle adds class', async ({ page }) => {
 	await gotoReady(page);
 	await page.locator('#markdown-input').fill('Primeiro.\n\nSegundo.\n\nTerceiro.');
@@ -124,4 +138,28 @@ test('katex renders math', async ({ page }) => {
 	await gotoReady(page);
 	await page.locator('#markdown-input').fill('Equação: $a^2 + b^2 = c^2$.');
 	await expect(page.locator('#legal-preview-container .katex')).toBeVisible();
+});
+
+test('downloaded HTML is visible (page-container not hidden by editor CSS)', async ({ page }) => {
+	await gotoReady(page);
+	await page.locator('#markdown-input').fill('# Título\n\nConteúdo do documento.');
+
+	const downloadPromise = page.waitForEvent('download');
+	await page.getByRole('button', { name: 'Baixar HTML' }).click();
+	const download = await downloadPromise;
+	const stream = await download.createReadStream();
+	const chunks: Buffer[] = [];
+	for await (const chunk of stream) chunks.push(chunk as Buffer);
+	const html = Buffer.concat(chunks).toString('utf-8');
+
+	expect(html).toContain('<main>');
+	expect(html).toContain('class="page-container');
+	expect(html).toContain('Conteúdo do documento.');
+
+	// Open the downloaded HTML directly and assert content is visible.
+	await page.setContent(html);
+	await expect(page.locator('main > .page-container')).toBeVisible();
+	await expect(page.locator('main > .page-container article')).toContainText(
+		'Conteúdo do documento.',
+	);
 });

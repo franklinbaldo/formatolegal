@@ -15,6 +15,11 @@ Acesse: [https://franklinbaldo.github.io/formatolegal/](https://franklinbaldo.gi
   - **CNJ / STF-STJ** — Arial 12pt, 1,5, margens 3/2/2/3cm (Resolução CNJ 234).
   - **OAB Tradicional** — Times 12, h2 numerado automaticamente em algarismos romanos (I, II, III...), recuo 2cm.
   - **Contrato** — Times 11pt, single-spaced, listas ordenadas renderizadas como cláusulas hierárquicas (1.1, 1.2.3).
+  - **🌃 Cyberpunk Noturno** — fundo dark, headings em JetBrains Mono com glow neon ciano/rosa.
+  - **📜 Manuscrito Vintage** — papel sépia, EB Garamond + Cinzel, drop-cap no primeiro parágrafo, divisores ornamentais.
+  - **🌸 Pastel Sereno** — gradiente lavanda/pêssego, h2 em pílulas arredondadas, vibe calma e moderna.
+  - **⬛ Brutalista** — preto/branco com acento vermelho, h1 invertido, bordas grossas, sombra "pixel".
+  - **🎉 Petição Festa** — diversão total: Caveat manuscrito, gradiente arco-íris no topo, emojis em h1/h2/h3/listas/blockquote/hr.
 - **Numerar parágrafos**: toggle independente que numera cada `<p>` automaticamente — útil para memoriais.
 - **Markdown estendido**:
   - **Mermaid** — diagramas em blocos ` ```mermaid ` (fluxogramas, sequência, gantt) renderizados como SVG, inclusive na impressão.

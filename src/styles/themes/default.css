@@ -1,0 +1,5 @@
+/* Default theme uses base typography (Lora/Montserrat) directly. */
+/* No overrides needed — this file is intentionally minimal. */
+.theme-default {
+	font-family: 'Lora', serif;
+}

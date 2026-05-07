@@ -5,6 +5,11 @@ export const THEMES = [
 	'theme-cnj',
 	'theme-oab',
 	'theme-contrato',
+	'theme-cyberpunk',
+	'theme-vintage',
+	'theme-pastel',
+	'theme-brutalist',
+	'theme-festa',
 ] as const;
 
 export type Theme = (typeof THEMES)[number];
@@ -16,6 +21,11 @@ export const THEME_LABELS: Record<Theme, string> = {
 	'theme-cnj': 'CNJ / STF-STJ (Arial 12)',
 	'theme-oab': 'OAB Tradicional (numerais)',
 	'theme-contrato': 'Contrato (Times 11, cláusulas)',
+	'theme-cyberpunk': '🌃 Cyberpunk Noturno',
+	'theme-vintage': '📜 Manuscrito Vintage',
+	'theme-pastel': '🌸 Pastel Sereno',
+	'theme-brutalist': '⬛ Brutalista',
+	'theme-festa': '🎉 Petição Festa',
 };
 
 export const STORAGE_KEYS = {
