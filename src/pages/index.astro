@@ -3,55 +3,73 @@ import LegalLayout from '../layouts/LegalLayout.astro';
 ---
 
 <LegalLayout title="Formato Legal - Editor de Petições">
-	<div class="editor-interface no-print">
-		<div class="toolbar">
-			<div class="logo">
-				<span class="icon">⚖️</span>
-				<h1>Formato Legal</h1>
-			</div>
-			<div class="actions">
-				<div class="theme-selector">
-					<select id="theme-select" aria-label="Tema"></select>
-				</div>
-				<input type="file" id="file-upload" accept=".md,.txt,.html" style="display: none;" />
-				<button id="upload-btn" class="secondary">Subir Arquivo</button>
-				<button id="download-html-btn" class="secondary">Baixar HTML</button>
-				<button id="clear-btn" class="secondary">Limpar</button>
-				<button id="print-btn" class="primary">Imprimir PDF</button>
-			</div>
-		</div>
+	<div class="editor-interface no-print pico">
+		<header class="toolbar">
+			<nav>
+				<ul>
+					<li>
+						<h1>
+							<span aria-hidden="true">⚖️</span> Formato Legal
+						</h1>
+					</li>
+				</ul>
+				<ul>
+					<li>
+						<select id="theme-select" aria-label="Tema"></select>
+					</li>
+					<li>
+						<input
+							type="file"
+							id="file-upload"
+							accept=".md,.txt,.html"
+							hidden
+						/>
+						<button id="upload-btn" class="secondary">Subir Arquivo</button>
+					</li>
+					<li>
+						<button id="download-html-btn" class="secondary">Baixar HTML</button>
+					</li>
+					<li>
+						<button id="clear-btn" class="secondary outline">Limpar</button>
+					</li>
+					<li>
+						<button id="print-btn">Imprimir PDF</button>
+					</li>
+				</ul>
+			</nav>
+		</header>
 
-		<div class="mobile-tabs">
-			<button id="tab-editor" class="active" type="button">Editor</button>
-			<button id="tab-preview" type="button">Visualização</button>
-		</div>
+		<nav class="mobile-tabs" role="tablist">
+			<button id="tab-editor" type="button" role="tab" aria-selected="true">Editor</button>
+			<button id="tab-preview" type="button" role="tab" aria-selected="false" class="outline">
+				Visualização
+			</button>
+		</nav>
 
 		<div class="main-split">
-			<div class="editor-pane">
-				<div class="pane-header">
-					<span>Markdown / Texto</span>
-					<div class="template-selector">
-						<select id="template-select" aria-label="Modelo">
-							<option value="">Carregar Exemplo...</option>
-							<option value="apelacao">Apelação Cível</option>
-							<option value="contestacao">Contestação</option>
-						</select>
-					</div>
-				</div>
+			<section class="editor-pane">
+				<header class="pane-header">
+					<small><strong>Markdown / Texto</strong></small>
+					<select id="template-select" aria-label="Modelo">
+						<option value="">Carregar Exemplo...</option>
+						<option value="apelacao">Apelação Cível</option>
+						<option value="contestacao">Contestação</option>
+					</select>
+				</header>
 				<textarea id="markdown-input" placeholder="Cole seu Markdown aqui..."></textarea>
-			</div>
+			</section>
 
-			<div class="preview-pane">
-				<div class="pane-header">
-					<span>Visualização em A4</span>
-					<div id="status-bar" class="status-bar"></div>
-				</div>
+			<section class="preview-pane">
+				<header class="pane-header">
+					<small><strong>Visualização em A4</strong></small>
+					<small id="status-bar"></small>
+				</header>
 				<div id="legal-preview-container" class="legal-paper">
 					<div class="placeholder-msg">
 						<p>O resultado da formatação jurídica aparecerá aqui em tempo real.</p>
 					</div>
 				</div>
-			</div>
+			</section>
 		</div>
 	</div>
 
@@ -68,89 +86,47 @@ import LegalLayout from '../layouts/LegalLayout.astro';
 			position: fixed;
 			top: 0;
 			left: 0;
-			background: #f8f9fa;
+			background: var(--pico-background-color);
 			z-index: 1000;
 		}
 
-		.toolbar {
-			min-height: 60px;
-			background: #1a2a44;
-			display: flex;
-			justify-content: space-between;
-			align-items: center;
-			padding: 0 20px;
-			color: white;
-			box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
-			flex-wrap: wrap;
-			gap: 8px;
+		.editor-interface > header.toolbar {
+			padding: 0 1rem;
+			background: var(--pico-card-background-color);
+			border-bottom: 1px solid var(--pico-muted-border-color);
 		}
 
-		.logo {
-			display: flex;
-			align-items: center;
-			gap: 10px;
-		}
-
-		.logo h1 {
-			font-size: 1.2rem;
-			margin: 0;
-			color: white;
-			text-transform: none;
-			border: none;
+		.editor-interface > header.toolbar nav {
 			padding: 0;
 		}
 
-		.actions {
-			display: flex;
-			gap: 10px;
-			flex-wrap: wrap;
+		.editor-interface > header.toolbar h1 {
+			font-size: 1.1rem;
+			margin: 0;
+			padding: 0;
+			color: var(--pico-primary);
 		}
 
-		button {
-			padding: 8px 16px;
-			border-radius: 6px;
-			border: none;
-			font-weight: 600;
-			cursor: pointer;
-			transition: all 0.2s;
+		.editor-interface > header.toolbar nav ul li {
+			padding: 0.5rem 0.25rem;
 		}
 
-		.primary {
-			background: #3a7bd5;
-			color: white;
-		}
-
-		.primary:hover {
-			background: #00d2ff;
-		}
-
-		.secondary {
-			background: rgba(255, 255, 255, 0.1);
-			color: white;
-			border: 1px solid rgba(255, 255, 255, 0.2);
-		}
-
-		.secondary:hover {
-			background: rgba(255, 255, 255, 0.2);
+		.editor-interface > header.toolbar select,
+		.editor-interface > header.toolbar button {
+			margin: 0;
 		}
 
 		.mobile-tabs {
 			display: none;
-			background: #f1f3f5;
-			border-bottom: 1px solid #ddd;
+			padding: 0;
+			gap: 0;
+			border-bottom: 1px solid var(--pico-muted-border-color);
 		}
 
 		.mobile-tabs button {
 			flex: 1;
-			background: transparent;
-			color: #555;
+			margin: 0;
 			border-radius: 0;
-			border-bottom: 2px solid transparent;
-		}
-
-		.mobile-tabs button.active {
-			color: #1a2a44;
-			border-bottom-color: #3a7bd5;
 		}
 
 		.main-split {
@@ -163,56 +139,51 @@ import LegalLayout from '../layouts/LegalLayout.astro';
 			width: 40%;
 			display: flex;
 			flex-direction: column;
-			border-right: 1px solid #ddd;
-			background: white;
+			border-right: 1px solid var(--pico-muted-border-color);
 			transition: background-color 0.15s;
 		}
 
 		.editor-pane.drag-over {
-			background: #f0f7ff;
+			background: var(--pico-primary-background);
 		}
 
 		.preview-pane {
 			flex: 1;
 			display: flex;
 			flex-direction: column;
-			background: #e9ecef;
+			background: var(--pico-secondary-background, #e9ecef);
 			overflow-y: auto;
 		}
 
 		.preview-pane > .legal-paper {
-			margin: 40px auto;
+			margin: 2rem auto;
 		}
 
 		.pane-header {
-			padding: 10px 20px;
-			background: #f1f3f5;
-			border-bottom: 1px solid #ddd;
 			display: flex;
 			justify-content: space-between;
 			align-items: center;
-			font-size: 12px;
-			font-weight: 700;
-			text-transform: uppercase;
-			color: #666;
+			padding: 0.5rem 1rem;
+			background: var(--pico-card-sectioning-background-color, var(--pico-card-background-color));
+			border-bottom: 1px solid var(--pico-muted-border-color);
+			margin: 0;
 		}
 
-		.status-bar {
-			font-weight: 500;
-			text-transform: none;
-			color: #888;
+		.pane-header select {
+			width: auto;
+			min-width: 200px;
+			margin: 0;
 		}
 
-		textarea {
+		#markdown-input {
 			flex: 1;
-			padding: 20px;
-			font-family: 'Fira Code', 'Cascadia Code', monospace;
-			font-size: 14px;
-			line-height: 1.6;
+			margin: 0;
 			border: none;
-			outline: none;
+			border-radius: 0;
+			font-family: 'Fira Code', 'Cascadia Code', monospace;
+			font-size: 0.875rem;
+			line-height: 1.6;
 			resize: none;
-			color: #2c3e50;
 		}
 
 		.legal-paper {
@@ -229,7 +200,7 @@ import LegalLayout from '../layouts/LegalLayout.astro';
 			display: flex;
 			align-items: center;
 			justify-content: center;
-			color: #adb5bd;
+			color: var(--pico-muted-color);
 			font-style: italic;
 			text-align: center;
 		}
@@ -248,7 +219,7 @@ import LegalLayout from '../layouts/LegalLayout.astro';
 			.editor-pane {
 				width: 100%;
 				border-right: none;
-				border-bottom: 1px solid #ddd;
+				border-bottom: 1px solid var(--pico-muted-border-color);
 			}
 			.editor-pane.mobile-hidden,
 			.preview-pane.mobile-hidden {

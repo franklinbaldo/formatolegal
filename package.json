@@ -17,6 +17,7 @@
     "test": "playwright test"
   },
   "dependencies": {
+    "@picocss/pico": "^2.1.1",
     "astro": "^6.1.10",
     "dompurify": "^3.2.0",
     "marked": "^18.0.3"

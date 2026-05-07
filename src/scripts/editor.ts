@@ -136,8 +136,10 @@ function setMobileTab(which: 'editor' | 'preview'): void {
   if (!tabEditorBtn || !tabPreviewBtn) return;
   editorPane.classList.toggle('mobile-hidden', which !== 'editor');
   previewPane.classList.toggle('mobile-hidden', which !== 'preview');
-  tabEditorBtn.classList.toggle('active', which === 'editor');
-  tabPreviewBtn.classList.toggle('active', which === 'preview');
+  tabEditorBtn.classList.toggle('outline', which !== 'editor');
+  tabPreviewBtn.classList.toggle('outline', which !== 'preview');
+  tabEditorBtn.setAttribute('aria-selected', String(which === 'editor'));
+  tabPreviewBtn.setAttribute('aria-selected', String(which === 'preview'));
 }
 
 themeSelect.innerHTML = THEMES.map(
