@@ -15,14 +15,42 @@ export function collectInlineStyles(): string {
 		.join('\n');
 }
 
-export function buildStandaloneHtml(themeClass: string, articleHtml: string): string {
-	const styles = collectInlineStyles();
+export async function collectAllStyles(): Promise<string> {
+	const inline = collectInlineStyles();
+	const linkUrls = Array.from(
+		document.querySelectorAll<HTMLLinkElement>('link[rel="stylesheet"]'),
+	)
+		.map((l) => l.href)
+		.filter((href) => href && !href.startsWith('https://fonts.googleapis.com'));
+
+	const fetched = await Promise.all(
+		linkUrls.map(async (url) => {
+			try {
+				const res = await fetch(url);
+				if (!res.ok) return '';
+				return await res.text();
+			} catch {
+				return '';
+			}
+		}),
+	);
+
+	return [...fetched, inline].join('\n');
+}
+
+import { GOOGLE_FONTS_URL } from '../styles/fonts';
+
+export async function buildStandaloneHtml(
+	themeClass: string,
+	articleHtml: string,
+): Promise<string> {
+	const styles = await collectAllStyles();
 	return `<!DOCTYPE html>
 <html lang="pt-br">
 <head>
 <meta charset="utf-8" />
 <title>Petição</title>
-<link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400..700;1,400..700&family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
+<link href="${GOOGLE_FONTS_URL}" rel="stylesheet">
 <style>${styles}</style>
 </head>
 <body>

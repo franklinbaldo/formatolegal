@@ -1,0 +1,2 @@
+export const GOOGLE_FONTS_URL =
+	'https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400..700;1,400..700&family=Montserrat:wght@400;700&family=Caveat:wght@400;700&family=Cinzel:wght@400;700&family=EB+Garamond:ital,wght@0,400..700;1,400..700&family=Inter:wght@400;700&family=JetBrains+Mono:wght@400;700&family=Nunito:wght@400;700&family=Quicksand:wght@400;700&family=Space+Grotesk:wght@400;700&display=swap';

@@ -1,0 +1,81 @@
+/* Brutalista — preto/branco com acento vermelho, bordas grossas, sombra hard. */
+.theme-brutalist {
+	--margin-top: 30mm;
+	--margin-right: 25mm;
+	--margin-bottom: 30mm;
+	--margin-left: 25mm;
+	--paper-bg: #fff;
+	--paper-color: #000;
+	color: var(--paper-color);
+	font-family: 'Space Grotesk', system-ui, sans-serif;
+	font-size: 12pt;
+	line-height: 1.5;
+	border: 4px solid #000;
+	box-shadow: 12px 12px 0 #000 !important;
+}
+.theme-brutalist h1,
+.theme-brutalist h2,
+.theme-brutalist h3,
+.theme-brutalist h4 {
+	font-family: 'Space Grotesk', sans-serif;
+	color: #000;
+	font-weight: 700;
+	text-transform: uppercase;
+	letter-spacing: -0.02em;
+	border: none;
+	padding: 0;
+}
+.theme-brutalist h1 {
+	font-size: 3rem;
+	line-height: 0.95;
+	background: #000;
+	color: #fff;
+	padding: 0.4em 0.5em;
+	margin: 0 -0.2em 1em -0.2em;
+	display: block;
+}
+.theme-brutalist h2 {
+	font-size: 1.6rem;
+	border-bottom: 4px solid #000;
+	padding-bottom: 0.1em;
+	margin-top: 2em;
+}
+.theme-brutalist h2::after {
+	content: ' ▮';
+	color: #d92d2d;
+}
+.theme-brutalist h3 {
+	font-size: 1.2rem;
+	text-decoration: underline;
+	text-decoration-thickness: 3px;
+	text-underline-offset: 4px;
+}
+.theme-brutalist strong {
+	background: #000;
+	color: #fff;
+	padding: 0 0.2em;
+}
+.theme-brutalist blockquote {
+	border-left: 8px solid #d92d2d;
+	background: #fff;
+	color: #000;
+	font-weight: 500;
+	padding: 1em 1.5em;
+	margin: 1.5em 0;
+}
+.theme-brutalist a {
+	color: #d92d2d;
+	font-weight: 700;
+	text-decoration: underline;
+	text-decoration-thickness: 2px;
+}
+.theme-brutalist hr {
+	border-top: 4px solid #000;
+	margin: 2em 0;
+}
+.theme-brutalist hr::after {
+	background: #fff;
+	color: #000;
+	font-weight: 700;
+	border: 2px solid #000;
+}

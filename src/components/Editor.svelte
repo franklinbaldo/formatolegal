@@ -136,7 +136,7 @@
 	async function downloadHtml(): Promise<void> {
 		if (!markdown.trim()) return;
 		const html = await renderMarkdown(markdown);
-		const doc = buildStandaloneHtml(theme, html);
+		const doc = await buildStandaloneHtml(theme, html);
 		downloadBlob('peticao.html', new Blob([doc], { type: 'text/html' }));
 	}
 </script>

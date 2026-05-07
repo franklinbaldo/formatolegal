@@ -1,0 +1,41 @@
+/* OAB Tradicional — Times 12, 1,5; H2 com numeração romana automática; recuo 2cm */
+.theme-oab {
+	--margin-top: 30mm;
+	--margin-right: 20mm;
+	--margin-bottom: 30mm;
+	--margin-left: 30mm;
+	font-family: 'Times New Roman', Times, serif;
+	font-size: 12pt;
+	line-height: 1.5;
+	counter-reset: oab-section;
+}
+.theme-oab h1,
+.theme-oab h2,
+.theme-oab h3 {
+	font-family: 'Times New Roman', Times, serif;
+	color: #000;
+	border: none;
+	padding: 0;
+	font-weight: 700;
+}
+.theme-oab h1 {
+	font-size: 12pt;
+	text-align: center;
+	text-transform: uppercase;
+}
+.theme-oab h2 {
+	font-size: 12pt;
+	text-transform: uppercase;
+	counter-increment: oab-section;
+}
+.theme-oab h2::before {
+	content: counter(oab-section, upper-roman) '. ';
+}
+.theme-oab h3 {
+	font-size: 12pt;
+}
+.theme-oab p {
+	text-indent: 2cm;
+	margin-bottom: 0;
+	text-align: justify;
+}

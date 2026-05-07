@@ -1,0 +1,29 @@
+@page {
+	size: A4;
+	margin: 25mm 20mm;
+	@bottom-right {
+		content: 'Pág. ' counter(page) ' de ' counter(pages);
+		font-family: inherit;
+		font-size: 9pt;
+		color: #555;
+	}
+}
+
+@media print {
+	body {
+		background: white !important;
+		padding: 0 !important;
+	}
+	.page-container {
+		box-shadow: none !important;
+		margin: 0 !important;
+		width: 100% !important;
+	}
+	hr {
+		border: none;
+		margin: 0;
+	}
+	hr::after {
+		display: none;
+	}
+}

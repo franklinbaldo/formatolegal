@@ -1,0 +1,38 @@
+/* ABNT NBR 14724 — Times 12, 1,5; margens 3/2/2/3cm; recuo 1,25cm */
+.theme-abnt {
+	--margin-top: 30mm;
+	--margin-right: 20mm;
+	--margin-bottom: 20mm;
+	--margin-left: 30mm;
+	font-family: 'Times New Roman', Times, serif;
+	font-size: 12pt;
+	line-height: 1.5;
+}
+.theme-abnt h1,
+.theme-abnt h2,
+.theme-abnt h3,
+.theme-abnt h4 {
+	font-family: 'Times New Roman', Times, serif;
+	color: #000;
+	text-transform: none;
+	border: none;
+	padding: 0;
+	font-weight: 700;
+}
+.theme-abnt h1 {
+	font-size: 12pt;
+	text-transform: uppercase;
+	text-align: center;
+}
+.theme-abnt h2 {
+	font-size: 12pt;
+	text-transform: uppercase;
+}
+.theme-abnt h3 {
+	font-size: 12pt;
+}
+.theme-abnt p {
+	text-indent: 1.25cm;
+	margin-bottom: 0;
+	text-align: justify;
+}
