@@ -29,6 +29,15 @@
 	});
 
 	const pageCountLabel = $derived(pages.length || (htmlContent ? 1 : 1));
+
+	const pageSnark = $derived.by(() => {
+		const n = pages.length;
+		if (n >= 100) return 'cliente vai pagar caro';
+		if (n >= 50) return 'juiz vai dormir';
+		if (n >= 30) return 'alguém leu o art. 489?';
+		if (n >= 15) return 'rumo à Súmula Vinculante';
+		return '';
+	});
 </script>
 
 <div class="preview-pane {isHidden ? 'mobile-hidden' : ''}">
@@ -36,7 +45,7 @@
 		<span>Visualização em A4</span>
 		<div id="status-bar" class="pane-stats">
 			<span class="stat-pill">{wordCount} palavras</span>
-			<span class="stat-pill">{pageCountLabel} {pageCountLabel === 1 ? 'página' : 'páginas'}</span>
+			<span class="stat-pill" title={pageSnark}>{pageCountLabel} {pageCountLabel === 1 ? 'página' : 'páginas'}{pageSnark ? ` · ${pageSnark}` : ''}</span>
 		</div>
 	</header>
 	<div class="paper-viewport">

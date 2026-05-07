@@ -18,36 +18,71 @@
 	overflow: hidden;
 }
 
-/* Toolbar — Pico nav with data-theme="dark"; we only set the layout */
+/* Toolbar — light Pico nav, compact icon-only actions */
 .toolbar {
-	--pico-nav-element-spacing-vertical: 0.5rem;
-	--pico-nav-element-spacing-horizontal: 0.5rem;
-	padding: 0.5rem 1rem;
-	border-bottom: 2px solid rgba(255, 193, 7, 0.3);
-	box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+	--pico-nav-element-spacing-vertical: 0.4rem;
+	--pico-nav-element-spacing-horizontal: 0.35rem;
+	padding: 0.4rem 0.85rem;
+	border-bottom: 1px solid var(--pico-muted-border-color, #e9ecef);
+	background: var(--pico-card-background-color, #fff);
+	box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
 	z-index: 1100;
 	flex-wrap: wrap;
-	gap: 0.5rem;
+	gap: 0.35rem;
 }
 
 .toolbar .brand {
 	display: inline-flex;
 	align-items: center;
-	gap: 0.5rem;
+	gap: 0.4rem;
 }
 
+.toolbar .gavel {
+	all: unset;
+	cursor: pointer;
+	display: inline-flex;
+	align-items: center;
+	border-radius: 50%;
+	transition: transform 0.15s ease;
+}
+.toolbar .gavel:hover { transform: rotate(-12deg); }
+.toolbar .gavel:active { transform: rotate(20deg) scale(0.92); }
+.toolbar .gavel:focus-visible { outline: 2px solid var(--pico-primary, #4c6ef5); outline-offset: 2px; }
+
 .toolbar .icon {
-	font-size: 1.5rem;
+	font-size: 1.35rem;
 	line-height: 1;
 }
 
 .toolbar .privacy-badge small {
-	opacity: 0.7;
+	opacity: 0.65;
 	white-space: nowrap;
+	cursor: help;
 }
 
 .toolbar select {
-	min-width: 12rem;
+	min-width: 10rem;
+	font-size: 0.85rem;
+}
+
+.toolbar .icon-btn {
+	width: 2.25rem;
+	height: 2.25rem;
+	padding: 0;
+	font-size: 1rem;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+}
+
+.toolbar .primary-action {
+	font-size: 0.85rem;
+	padding: 0.4rem 0.85rem;
+	white-space: nowrap;
+}
+
+.toolbar-actions {
+	gap: 0.3rem !important;
 }
 
 /* Dropdown menu — Pico's <details class="dropdown"> handles open/close,
@@ -99,6 +134,49 @@
 
 .toolbar details.dropdown li button.danger-item {
 	color: var(--pico-color-red-500, #c92a2a);
+}
+
+/* Toast (easter-egg notifications) */
+.toast {
+	position: fixed;
+	left: 50%;
+	bottom: 32px;
+	transform: translateX(-50%);
+	background: #1a2a44;
+	color: white;
+	padding: 0.75rem 1.25rem;
+	border-radius: 999px;
+	font-family: 'Montserrat', sans-serif;
+	font-size: 0.9rem;
+	box-shadow: 0 12px 40px rgba(0, 0, 0, 0.25);
+	z-index: 2000;
+	pointer-events: none;
+	animation: toastIn 0.3s ease-out;
+}
+@keyframes toastIn {
+	from { opacity: 0; transform: translate(-50%, 12px); }
+	to { opacity: 1; transform: translate(-50%, 0); }
+}
+
+/* Konami confetti rain */
+.confetti-rain {
+	position: fixed;
+	inset: 0;
+	pointer-events: none;
+	overflow: hidden;
+	z-index: 1900;
+}
+.confetti-rain span {
+	position: absolute;
+	top: -2rem;
+	left: calc((var(--i) / 40) * 100%);
+	font-size: 1.5rem;
+	animation: fall 3.2s linear forwards;
+	animation-delay: calc((var(--i) % 8) * 0.08s);
+}
+@keyframes fall {
+	0% { transform: translateY(-3rem) rotate(0deg); opacity: 1; }
+	100% { transform: translateY(105vh) rotate(540deg); opacity: 0.2; }
 }
 
 /* Mobile/desktop visibility */

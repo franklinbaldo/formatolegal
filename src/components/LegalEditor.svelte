@@ -7,16 +7,40 @@
 	import EditorPane from './EditorPane.svelte';
 	import PreviewPane from './PreviewPane.svelte';
 
-	// Runes (Svelte 5)
 	let content = $state('');
 	let theme = $state<Theme>('theme-default');
 	let htmlContent = $state('');
 	let mobileTab = $state<'editor' | 'preview'>('editor');
 	let mounted = $state(false);
 	let copyLabel = $state('Copiar HTML');
-	let docsLabel = $state('Abrir no Google Docs');
+	let gavelClicks = $state(0);
+	let toastMsg = $state('');
+	let confettiActive = $state(false);
 
-	// Keyboard shortcuts
+	// Easter-egg pools
+	const COPY_SUCCESS_MSGS = [
+		'✓ Copiado!',
+		'✓ Na área de transferência (não no STF).',
+		'✓ Copiado. Pole onde quiser, salvo em juízo.',
+		'✓ Ctrl+V em vigor.',
+		'✓ Habeas copium concedido.',
+	];
+	const PRIVACY_TOOLTIPS = [
+		'Sua minuta não é enviada a servidores. Tudo roda no seu navegador.',
+		'Sigilo absoluto: nem o estagiário vê.',
+		'Processado localmente. Nem a NSA, nem o CADE, nem sua sogra.',
+		'Não vendemos seus dados. Nem em prequestionamento.',
+		'Roda offline. Como o judiciário em greve.',
+	];
+	const GAVEL_REACTIONS = [
+		{ at: 5, msg: '⚖️ Ordem! Ordem na sala!' },
+		{ at: 10, msg: '⚖️ Defiro a martelagem.' },
+		{ at: 20, msg: '⚖️ Por unanimidade: chega.' },
+		{ at: 50, msg: '⚖️ Tribunal de exceção declarado.' },
+	];
+
+	let privacyTooltip = $state(PRIVACY_TOOLTIPS[0]);
+
 	$effect(() => {
 		const handleKeyDown = (e: KeyboardEvent) => {
 			if ((e.ctrlKey || e.metaKey) && e.key === 's') {
@@ -28,7 +52,6 @@
 		return () => window.removeEventListener('keydown', handleKeyDown);
 	});
 
-	// Derived values (Sync rendering)
 	$effect(() => {
 		const update = async () => {
 			if (!content.trim()) {
@@ -38,8 +61,6 @@
 			htmlContent = await renderMarkdown(content);
 		};
 		update();
-		
-		// Auto-save (only after mount to avoid clearing storage with initial empty string)
 		if (mounted) {
 			safeLocalStorage.set(STORAGE_KEYS.content, content);
 		}
@@ -51,25 +72,60 @@
 		}
 	});
 
+	// Konami code → "modo festa": switch to the festa theme and rain confetti.
+	$effect(() => {
+		const sequence = ['ArrowUp', 'ArrowUp', 'ArrowDown', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'ArrowLeft', 'ArrowRight', 'b', 'a'];
+		let idx = 0;
+		const onKey = (e: KeyboardEvent) => {
+			const expected = sequence[idx];
+			if (e.key.toLowerCase() === expected.toLowerCase()) {
+				idx++;
+				if (idx === sequence.length) {
+					idx = 0;
+					triggerFesta();
+				}
+			} else {
+				idx = 0;
+			}
+		};
+		window.addEventListener('keydown', onKey);
+		return () => window.removeEventListener('keydown', onKey);
+	});
+
+	function triggerFesta() {
+		theme = 'theme-festa' as Theme;
+		confettiActive = true;
+		showToast('🎉 Modo Petição Festa ativado. Que comece o show!');
+		setTimeout(() => (confettiActive = false), 3500);
+	}
+
+	function showToast(msg: string) {
+		toastMsg = msg;
+		setTimeout(() => {
+			if (toastMsg === msg) toastMsg = '';
+		}, 3000);
+	}
+
+	function handleGavel() {
+		gavelClicks++;
+		const reaction = GAVEL_REACTIONS.find((r) => r.at === gavelClicks);
+		if (reaction) showToast(reaction.msg);
+	}
+
 	onMount(() => {
 		const savedContent = safeLocalStorage.get(STORAGE_KEYS.content);
 		if (savedContent) content = savedContent;
-
 		const savedTheme = safeLocalStorage.get(STORAGE_KEYS.theme);
 		if (savedTheme && isTheme(savedTheme)) theme = savedTheme;
-		
+		privacyTooltip = PRIVACY_TOOLTIPS[Math.floor(Math.random() * PRIVACY_TOOLTIPS.length)];
 		mounted = true;
 	});
 
 	async function handlePrint() {
-		// Ensure htmlContent is fresh
 		htmlContent = await renderMarkdown(content);
-
-		// Update the print-article in the DOM (used by LegalLayout/CSS)
 		const printArticle = document.getElementById('print-article');
 		if (printArticle) {
 			printArticle.innerHTML = htmlContent;
-			// Ensure the container has the correct theme class
 			const container = printArticle.parentElement;
 			if (container) {
 				container.className = `page-container ${theme}`;
@@ -85,7 +141,7 @@
 	}
 
 	function handleClear() {
-		if (confirm('Deseja limpar todo o conteúdo?')) {
+		if (confirm('Deseja limpar todo o conteúdo? (Sem direito a embargos.)')) {
 			content = '';
 		}
 	}
@@ -93,16 +149,8 @@
 	async function handleCopyHtml() {
 		if (!htmlContent) return;
 		await copyHtmlToClipboard(htmlContent);
-		copyLabel = '✓ Copiado!';
-		setTimeout(() => (copyLabel = 'Copiar HTML'), 2000);
-	}
-
-	async function handleOpenInGoogleDocs() {
-		if (!htmlContent) return;
-		await copyHtmlToClipboard(htmlContent);
-		docsLabel = '✓ Cole com Ctrl+V';
-		window.open('https://docs.new', '_blank');
-		setTimeout(() => (docsLabel = 'Abrir no Google Docs'), 4000);
+		copyLabel = COPY_SUCCESS_MSGS[Math.floor(Math.random() * COPY_SUCCESS_MSGS.length)];
+		setTimeout(() => (copyLabel = 'Copiar HTML'), 2200);
 	}
 
 	function handleUpload(text: string) {
@@ -121,12 +169,12 @@
 		onDownload={handleDownload}
 		onCopyHtml={handleCopyHtml}
 		{copyLabel}
-		onOpenInGoogleDocs={handleOpenInGoogleDocs}
-		{docsLabel}
 		onClear={handleClear}
 		onUpload={handleUpload}
+		onGavel={handleGavel}
+		{privacyTooltip}
 	/>
-	
+
 	<div class="pane-tabs" role="tablist" aria-label="Painéis">
 		<button
 			type="button"
@@ -149,15 +197,27 @@
 	</div>
 
 	<div class="main-split">
-		<EditorPane 
-			bind:content={content} 
-			onTemplate={handleTemplate} 
+		<EditorPane
+			bind:content={content}
+			onTemplate={handleTemplate}
 			isHidden={mobileTab !== 'editor'}
 		/>
-		<PreviewPane 
-			{htmlContent} 
-			{theme} 
+		<PreviewPane
+			{htmlContent}
+			{theme}
 			isHidden={mobileTab !== 'preview'}
 		/>
 	</div>
+
+	{#if toastMsg}
+		<div class="toast" role="status" aria-live="polite">{toastMsg}</div>
+	{/if}
+
+	{#if confettiActive}
+		<div class="confetti-rain" aria-hidden="true">
+			{#each Array(40) as _, i (i)}
+				<span style="--i: {i};">{['🎉', '🎊', '⚖️', '📜', '🥳', '✨'][i % 6]}</span>
+			{/each}
+		</div>
+	{/if}
 </div>

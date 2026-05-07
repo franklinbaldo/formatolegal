@@ -15,7 +15,7 @@ test('page loads with title and toolbar', async ({ page }) => {
 	await gotoReady(page);
 	await expect(page).toHaveTitle(/Formato Legal/);
 	await expect(page.getByRole('heading', { name: 'Formato Legal' })).toBeVisible();
-	await expect(page.getByRole('button', { name: 'Salvar/Imprimir PDF' })).toBeVisible();
+	await expect(page.getByRole('button', { name: /Salvar PDF/ })).toBeVisible();
 });
 
 test('typing markdown renders headings in preview', async ({ page }) => {

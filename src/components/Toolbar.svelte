@@ -1,6 +1,16 @@
 <script lang="ts">
 	import { THEME_LABELS, THEME_GROUPS } from '../scripts/themes';
-	let { theme = $bindable(), onPrint, onDownload, onCopyHtml, copyLabel = 'Copiar HTML', onOpenInGoogleDocs, docsLabel = 'Abrir no Google Docs', onClear, onUpload } = $props();
+	let {
+		theme = $bindable(),
+		onPrint,
+		onDownload,
+		onCopyHtml,
+		copyLabel = 'Copiar HTML',
+		onClear,
+		onUpload,
+		onGavel,
+		privacyTooltip = 'Sua minuta não é enviada a servidores. Tudo roda no seu navegador.',
+	} = $props();
 
 	// eslint-disable-next-line no-undef
 	let menuDetails: HTMLDetailsElement | undefined = $state();
@@ -9,13 +19,10 @@
 		const target = e.currentTarget as HTMLInputElement;
 		const file = target.files?.[0];
 		if (!file) return;
-
 		const reader = new FileReader();
 		// eslint-disable-next-line no-undef
 		reader.onload = (e: ProgressEvent<FileReader>) => {
-			if (typeof e.target?.result === 'string') {
-				onUpload(e.target.result);
-			}
+			if (typeof e.target?.result === 'string') onUpload(e.target.result);
 		};
 		reader.readAsText(file);
 		target.value = '';
@@ -33,20 +40,24 @@
 			closeMenu();
 		};
 	}
+
+	const justCopied = $derived(copyLabel !== 'Copiar HTML');
 </script>
 
-<nav class="toolbar no-print" data-theme="dark" aria-label="Barra de ferramentas">
+<nav class="toolbar no-print" aria-label="Barra de ferramentas">
 	<ul>
 		<li class="brand">
-			<span class="icon" aria-hidden="true">⚖️</span>
+			<button type="button" class="gavel" onclick={onGavel} aria-label="Bater o martelo">
+				<span class="icon" aria-hidden="true">⚖️</span>
+			</button>
 			<strong role="heading" aria-level="1">Formato Legal</strong>
 		</li>
 		<li class="privacy-badge">
-			<small title="Sua minuta não é enviada a servidores. Tudo roda no seu navegador.">🔒 Processamento local</small>
+			<small title={privacyTooltip}>🔒 Local</small>
 		</li>
 	</ul>
 
-	<ul>
+	<ul class="toolbar-actions">
 		<li>
 			<select id="theme-select" bind:value={theme} aria-label="Selecione o estilo">
 				{#each THEME_GROUPS as group (group.label)}
@@ -62,23 +73,22 @@
 		<input type="file" bind:this={fileInput} accept=".md,.txt,.html" hidden onchange={handleFileChange} />
 
 		<li class="desktop-only">
-			<button class="secondary outline" onclick={() => fileInput.click()}>Importar minuta</button>
+			<button class="icon-btn secondary outline" title="Importar minuta" aria-label="Importar minuta" onclick={() => fileInput.click()}>📥</button>
 		</li>
 		<li class="desktop-only">
-			<button class="secondary outline" onclick={onDownload}>Exportar HTML</button>
+			<button class="icon-btn secondary outline" title="Exportar HTML" aria-label="Exportar HTML" onclick={onDownload}>💾</button>
 		</li>
 		<li class="desktop-only">
-			<button class="secondary outline" onclick={onCopyHtml}>{copyLabel}</button>
+			<button class="icon-btn secondary outline" title={justCopied ? copyLabel : 'Copiar HTML'} aria-label="Copiar HTML" onclick={onCopyHtml}>
+				{justCopied ? '✓' : '📋'}
+			</button>
 		</li>
 		<li class="desktop-only">
-			<button class="secondary outline" onclick={onOpenInGoogleDocs}>{docsLabel}</button>
-		</li>
-		<li class="desktop-only">
-			<button class="secondary outline" onclick={onClear}>Limpar tudo</button>
+			<button class="icon-btn secondary outline" title="Limpar tudo" aria-label="Limpar tudo" onclick={onClear}>🗑️</button>
 		</li>
 
 		<li>
-			<button onclick={onPrint}>Salvar/Imprimir PDF</button>
+			<button class="primary-action" onclick={onPrint}>🖨️ Salvar PDF</button>
 		</li>
 
 		<li class="mobile-only">
@@ -88,11 +98,10 @@
 						<span></span><span></span><span></span>
 					</span>
 				</summary>
-				<ul dir="rtl">
-					<li><button class="contrast outline" onclick={runAndClose(() => fileInput.click())}>📥 Importar minuta</button></li>
+				<ul>
+					<li><button class="contrast outline" onclick={runAndClose(() => fileInput.click())}>📥 Importar</button></li>
 					<li><button class="contrast outline" onclick={runAndClose(onDownload)}>💾 Exportar HTML</button></li>
-					<li><button class="contrast outline" onclick={runAndClose(onCopyHtml)}>📋 {copyLabel}</button></li>
-					<li><button class="contrast outline" onclick={runAndClose(onOpenInGoogleDocs)}>📝 {docsLabel}</button></li>
+					<li><button class="contrast outline" onclick={runAndClose(onCopyHtml)}>📋 {justCopied ? copyLabel : 'Copiar HTML'}</button></li>
 					<li><button class="contrast outline danger-item" onclick={runAndClose(onClear)}>🗑️ Limpar tudo</button></li>
 				</ul>
 			</details>
