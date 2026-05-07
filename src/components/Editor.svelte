@@ -143,59 +143,69 @@
 
 <div class="editor-interface no-print pico" data-hydrated={hydrated ? 'true' : undefined}>
 	<header class="toolbar">
-		<nav>
-			<ul>
-				<li>
-					<h1>
-						<span aria-hidden="true">⚖️</span> Formato Legal
-					</h1>
-				</li>
-			</ul>
-			<ul>
-				<li>
-					<select id="theme-select" aria-label="Tema" bind:value={theme}>
-						{#each THEMES as t (t)}
-							<option value={t}>{THEME_LABELS[t]}</option>
-						{/each}
-					</select>
-				</li>
-				<li>
-					<label class="numbered-toggle">
-						<input
-							id="numbered-paragraphs"
-							type="checkbox"
-							role="switch"
-							bind:checked={numberedParagraphs}
-						/>
-						Numerar §
-					</label>
-				</li>
-				<li>
+		<div class="toolbar-row toolbar-brand">
+			<h1 class="brand">
+				<span class="brand-icon" aria-hidden="true">⚖️</span>
+				<span class="brand-text">Formato Legal</span>
+			</h1>
+			<div class="brand-controls">
+				<select id="theme-select" aria-label="Tema" bind:value={theme}>
+					{#each THEMES as t (t)}
+						<option value={t}>{THEME_LABELS[t]}</option>
+					{/each}
+				</select>
+				<label class="numbered-toggle">
 					<input
-						type="file"
-						id="file-upload"
-						accept=".md,.txt,.html"
-						hidden
-						bind:this={fileInputEl}
-						onchange={onFileChange}
+						id="numbered-paragraphs"
+						type="checkbox"
+						role="switch"
+						bind:checked={numberedParagraphs}
 					/>
-					<button id="upload-btn" class="secondary" onclick={() => fileInputEl?.click()}>
-						Subir Arquivo
-					</button>
-				</li>
-				<li>
-					<button id="download-html-btn" class="secondary" onclick={downloadHtml}>
-						Baixar HTML
-					</button>
-				</li>
-				<li>
-					<button id="clear-btn" class="secondary outline" onclick={clear}>Limpar</button>
-				</li>
-				<li>
-					<button id="print-btn" onclick={print}>Imprimir PDF</button>
-				</li>
-			</ul>
-		</nav>
+					<span>Numerar §</span>
+				</label>
+			</div>
+		</div>
+		<div class="toolbar-row toolbar-actions">
+			<input
+				type="file"
+				id="file-upload"
+				accept=".md,.txt,.html"
+				hidden
+				bind:this={fileInputEl}
+				onchange={onFileChange}
+			/>
+			<button
+				id="upload-btn"
+				class="secondary action-btn"
+				onclick={() => fileInputEl?.click()}
+				title="Subir arquivo"
+			>
+				<span class="action-icon" aria-hidden="true">📂</span>
+				<span class="action-label">Subir</span>
+			</button>
+			<button
+				id="download-html-btn"
+				class="secondary action-btn"
+				onclick={downloadHtml}
+				title="Baixar HTML"
+			>
+				<span class="action-icon" aria-hidden="true">⬇️</span>
+				<span class="action-label">HTML</span>
+			</button>
+			<button
+				id="clear-btn"
+				class="secondary outline action-btn"
+				onclick={clear}
+				title="Limpar conteúdo"
+			>
+				<span class="action-icon" aria-hidden="true">🗑️</span>
+				<span class="action-label">Limpar</span>
+			</button>
+			<button id="print-btn" class="action-btn primary-action" onclick={print} title="Imprimir PDF">
+				<span class="action-icon" aria-hidden="true">🖨️</span>
+				<span class="action-label">Imprimir PDF</span>
+			</button>
+		</div>
 	</header>
 
 	<div class="mobile-tabs" role="tablist" aria-label="Painéis">
@@ -284,39 +294,89 @@
 	.editor-interface {
 		display: flex;
 		flex-direction: column;
-		height: 100vh;
+		height: 100dvh;
 		width: 100vw;
 		position: fixed;
-		top: 0;
-		left: 0;
+		inset: 0;
 		background: var(--pico-background-color);
 		z-index: 1000;
 	}
 
 	.editor-interface > header.toolbar {
-		padding: 0 1rem;
+		display: flex;
+		flex-direction: column;
+		gap: 0.5rem;
+		padding: 0.625rem 1rem;
 		background: var(--pico-card-background-color);
 		border-bottom: 1px solid var(--pico-muted-border-color);
 	}
 
-	.editor-interface > header.toolbar :global(nav) {
-		padding: 0;
+	.toolbar-row {
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
+		flex-wrap: wrap;
 	}
 
-	.editor-interface > header.toolbar h1 {
-		font-size: 1.1rem;
+	.toolbar-brand {
+		justify-content: space-between;
+	}
+
+	.brand {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.4rem;
+		font-size: 1.05rem;
+		font-weight: 600;
 		margin: 0;
 		padding: 0;
 		color: var(--pico-primary);
+		white-space: nowrap;
 	}
 
-	.editor-interface > header.toolbar :global(nav ul li) {
-		padding: 0.5rem 0.25rem;
+	.brand-icon {
+		font-size: 1.2rem;
+		line-height: 1;
 	}
 
-	.editor-interface > header.toolbar :global(select),
-	.editor-interface > header.toolbar :global(button) {
+	.brand-controls {
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
+		flex-wrap: wrap;
+	}
+
+	.toolbar :global(select#theme-select) {
 		margin: 0;
+		min-width: 9rem;
+		max-width: 14rem;
+		padding: 0.4rem 2rem 0.4rem 0.6rem;
+		font-size: 0.875rem;
+	}
+
+	.toolbar-actions {
+		gap: 0.4rem;
+	}
+
+	.action-btn {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		gap: 0.4rem;
+		margin: 0;
+		padding: 0.45rem 0.75rem;
+		font-size: 0.875rem;
+		white-space: nowrap;
+		flex: 0 1 auto;
+	}
+
+	.action-btn .action-icon {
+		font-size: 1rem;
+		line-height: 1;
+	}
+
+	.primary-action {
+		margin-left: auto;
 	}
 
 	.mobile-tabs {
@@ -366,16 +426,27 @@
 		display: flex;
 		justify-content: space-between;
 		align-items: center;
-		padding: 0.5rem 1rem;
+		gap: 0.5rem;
+		padding: 0.5rem 0.75rem;
 		background: var(--pico-card-sectioning-background-color, var(--pico-card-background-color));
 		border-bottom: 1px solid var(--pico-muted-border-color);
 		margin: 0;
+		flex-wrap: wrap;
 	}
 
 	.pane-header :global(select) {
 		width: auto;
-		min-width: 200px;
+		max-width: 100%;
+		min-width: 9rem;
 		margin: 0;
+		padding: 0.35rem 1.75rem 0.35rem 0.55rem;
+		font-size: 0.8rem;
+	}
+
+	.pane-header small {
+		min-width: 0;
+		overflow: hidden;
+		text-overflow: ellipsis;
 	}
 
 	#markdown-input {
@@ -444,10 +515,54 @@
 		.preview-pane.mobile-hidden {
 			display: none;
 		}
+		.preview-pane > .legal-paper {
+			margin: 1rem auto;
+		}
 		.legal-paper {
 			width: 100%;
 			min-height: 0;
 			padding: 20mm 12mm;
+		}
+	}
+
+	@media (max-width: 640px) {
+		.editor-interface > header.toolbar {
+			padding: 0.5rem 0.625rem;
+		}
+		.brand-text {
+			display: none;
+		}
+		.brand {
+			font-size: 1rem;
+		}
+		.toolbar :global(select#theme-select) {
+			flex: 1 1 auto;
+			min-width: 0;
+		}
+		.numbered-toggle {
+			font-size: 0.8rem;
+		}
+		.action-btn {
+			flex: 1 1 auto;
+			padding: 0.5rem 0.5rem;
+			font-size: 0.8rem;
+		}
+		.action-btn .action-label {
+			display: none;
+		}
+		.primary-action {
+			flex: 0 0 auto;
+			margin-left: auto;
+			padding: 0.5rem 0.85rem;
+		}
+		.primary-action .action-label {
+			display: inline;
+		}
+		.pane-header {
+			padding: 0.4rem 0.625rem;
+		}
+		.pane-header :global(select) {
+			flex: 1 1 auto;
 		}
 	}
 
