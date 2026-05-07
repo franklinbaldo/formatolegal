@@ -65,6 +65,37 @@ interface ParagraphSplit {
 	secondEstimatedHeight: number;
 }
 
+// Convert a pretext (segmentIndex, graphemeIndex) cursor into a UTF-16
+// character offset in the original text. Grapheme indices are resolved via
+// Intl.Segmenter so the math survives multi-codepoint emoji / combining marks.
+const graphemeSegmenter = typeof Intl !== 'undefined' && 'Segmenter' in Intl
+	? new Intl.Segmenter(undefined, { granularity: 'grapheme' })
+	: null;
+
+function cursorToCharOffset(
+	segments: string[],
+	cursor: LayoutCursor,
+): number {
+	let offset = 0;
+	for (let i = 0; i < cursor.segmentIndex && i < segments.length; i++) {
+		offset += segments[i].length;
+	}
+	if (cursor.segmentIndex < segments.length && cursor.graphemeIndex > 0) {
+		const seg = segments[cursor.segmentIndex];
+		if (graphemeSegmenter) {
+			let g = 0;
+			for (const piece of graphemeSegmenter.segment(seg)) {
+				if (g === cursor.graphemeIndex) break;
+				offset += piece.segment.length;
+				g++;
+			}
+		} else {
+			offset += Math.min(cursor.graphemeIndex, seg.length);
+		}
+	}
+	return offset;
+}
+
 // Split a paragraph (with or without inline children) into two paragraphs at
 // the line index that fits in `availableHeight`. Inline formatting (strong,
 // em, links, code, …) is preserved; cuts snap to whitespace and never go
@@ -74,6 +105,10 @@ function splitParagraph(
 	availableHeight: number,
 	contentWidth: number,
 ): ParagraphSplit | null {
+	// Hard line breaks (`<br>`) aren't represented in textContent, so pretext
+	// would under-count lines. Bail and let the block flow to the next page.
+	if (p.querySelector('br')) return null;
+
 	const cs = getComputedStyle(p);
 	const lineHeight = pxOr(cs.lineHeight, pxOr(cs.fontSize, 16) * 1.5);
 	const linesThatFit = Math.floor(availableHeight / lineHeight);
@@ -94,15 +129,7 @@ function splitParagraph(
 	}
 	if (!lastEnd) return null;
 
-	// Translate (segmentIndex, graphemeIndex) → char offset in fullText.
-	const segments = prepared.segments;
-	let cutOffset = 0;
-	for (let i = 0; i < lastEnd.segmentIndex && i < segments.length; i++) {
-		cutOffset += segments[i].length;
-	}
-	if (lastEnd.segmentIndex < segments.length) {
-		cutOffset += Math.min(lastEnd.graphemeIndex, segments[lastEnd.segmentIndex].length);
-	}
+	const cutOffset = cursorToCharOffset(prepared.segments, lastEnd);
 
 	// Walk DOM children, find the node that straddles `cutOffset`.
 	const first = p.cloneNode(false) as HTMLElement;
@@ -125,11 +152,18 @@ function splitParagraph(
 		}
 		// This child straddles the cut.
 		if (child.nodeType === 3) {
-			// Text node: split inside the text, snap to whitespace.
+			// Text node: snap the cut backward to the last whitespace at-or-before
+			// localCut so the first slice never extends past the line we already
+			// committed to. Fall back to a forward snap if the line has no leading
+			// whitespace (single very long word).
 			const localCut = Math.max(0, cutOffset - consumed);
 			const txt = childText;
 			let snap = localCut;
-			while (snap < txt.length && !/\s/.test(txt[snap])) snap++;
+			while (snap > 0 && !/\s/.test(txt[snap - 1])) snap--;
+			if (snap === 0) {
+				snap = localCut;
+				while (snap < txt.length && !/\s/.test(txt[snap])) snap++;
+			}
 			const beforeText = txt.slice(0, snap).trimEnd();
 			const afterText = txt.slice(snap).trimStart();
 			if (beforeText) first.appendChild(document.createTextNode(beforeText));
@@ -164,7 +198,6 @@ function splitParagraph(
 interface ContainerSplit {
 	first: HTMLElement;
 	second: HTMLElement;
-	firstHeight: number;
 	secondHeight: number;
 }
 
@@ -229,13 +262,12 @@ function splitContainer(
 		second.style.setProperty('--continuation-start', String(originalStart + cutIdx + 1));
 	}
 
-	const firstHeight = childBottoms[cutIdx] + bottomChrome;
 	const lastBottom = childBottoms[childBottoms.length - 1];
 	// The continuation re-renders the full container chrome (top + bottom
 	// padding/borders), so include both when reporting its height.
 	const secondHeight = (lastBottom - childBottoms[cutIdx]) + padTop + padBottom + borderTop + borderBottom;
 
-	return { first, second, firstHeight, secondHeight };
+	return { first, second, secondHeight };
 }
 
 // ---------------------------------------------------------------------------
