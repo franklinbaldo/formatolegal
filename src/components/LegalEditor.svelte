@@ -14,6 +14,7 @@
 	let mobileTab = $state<'editor' | 'preview'>('editor');
 	let mounted = $state(false);
 	let copyLabel = $state('Copiar HTML');
+	let docsLabel = $state('Abrir no Google Docs');
 
 	// Keyboard shortcuts
 	$effect(() => {
@@ -96,6 +97,14 @@
 		setTimeout(() => (copyLabel = 'Copiar HTML'), 2000);
 	}
 
+	async function handleOpenInGoogleDocs() {
+		if (!htmlContent) return;
+		await copyHtmlToClipboard(htmlContent);
+		docsLabel = '✓ Cole com Ctrl+V';
+		window.open('https://docs.new', '_blank');
+		setTimeout(() => (docsLabel = 'Abrir no Google Docs'), 4000);
+	}
+
 	function handleUpload(text: string) {
 		content = text;
 	}
@@ -112,6 +121,8 @@
 		onDownload={handleDownload}
 		onCopyHtml={handleCopyHtml}
 		{copyLabel}
+		onOpenInGoogleDocs={handleOpenInGoogleDocs}
+		{docsLabel}
 		onClear={handleClear}
 		onUpload={handleUpload}
 	/>

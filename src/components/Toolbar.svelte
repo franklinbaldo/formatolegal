@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { THEME_LABELS, THEME_GROUPS } from '../scripts/themes';
-	let { theme = $bindable(), onPrint, onDownload, onCopyHtml, copyLabel = 'Copiar HTML', onClear, onUpload } = $props();
+	let { theme = $bindable(), onPrint, onDownload, onCopyHtml, copyLabel = 'Copiar HTML', onOpenInGoogleDocs, docsLabel = 'Abrir no Google Docs', onClear, onUpload } = $props();
 
 	function handleFileChange(e: Event) {
 		const target = e.currentTarget as HTMLInputElement;
@@ -51,6 +51,9 @@
 		</li>
 		<li>
 			<button class="secondary outline copy-html-btn" onclick={onCopyHtml}>{copyLabel}</button>
+		</li>
+		<li>
+			<button class="secondary outline docs-btn" onclick={onOpenInGoogleDocs}>{docsLabel}</button>
 		</li>
 		<li>
 			<button class="secondary outline" onclick={onClear}>Limpar tudo</button>
