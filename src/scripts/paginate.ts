@@ -183,8 +183,14 @@ function splitContainer(
 	const containerCS = getComputedStyle(el);
 	const padTop = pxOr(containerCS.paddingTop, 0);
 	const padBottom = pxOr(containerCS.paddingBottom, 0);
+	const borderTop = pxOr(containerCS.borderTopWidth, 0);
+	const borderBottom = pxOr(containerCS.borderBottomWidth, 0);
 	const marginBottom = pxOr(containerCS.marginBottom, 0);
-	const containerOverhead = padTop + padBottom;
+	// childBottoms below are measured from the container's outer top edge, so
+	// they already include the container's top border + top padding. Only the
+	// bottom chrome remains to be added when checking how much of the page the
+	// first slice consumes.
+	const bottomChrome = padBottom + borderBottom;
 	// Reserve margin-bottom: the cloned first slice keeps it, and that space
 	// has to fit on the current page too.
 	const heightBudget = availableHeight - marginBottom;
@@ -199,7 +205,7 @@ function splitContainer(
 
 	let cutIdx = -1;
 	for (let i = 0; i < childBottoms.length; i++) {
-		if (childBottoms[i] + containerOverhead <= heightBudget) cutIdx = i;
+		if (childBottoms[i] + bottomChrome <= heightBudget) cutIdx = i;
 		else break;
 	}
 	if (cutIdx < 0 || cutIdx >= children.length - 1) return null;
@@ -223,9 +229,11 @@ function splitContainer(
 		second.style.setProperty('--continuation-start', String(originalStart + cutIdx + 1));
 	}
 
-	const firstHeight = childBottoms[cutIdx] + containerOverhead;
+	const firstHeight = childBottoms[cutIdx] + bottomChrome;
 	const lastBottom = childBottoms[childBottoms.length - 1];
-	const secondHeight = lastBottom - childBottoms[cutIdx];
+	// The continuation re-renders the full container chrome (top + bottom
+	// padding/borders), so include both when reporting its height.
+	const secondHeight = (lastBottom - childBottoms[cutIdx]) + padTop + padBottom + borderTop + borderBottom;
 
 	return { first, second, firstHeight, secondHeight };
 }
