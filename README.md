@@ -25,7 +25,6 @@ Acesse: [https://franklinbaldo.github.io/formatolegal/](https://franklinbaldo.gi
   - **Mermaid** — diagramas em blocos ` ```mermaid ` (fluxogramas, sequência, gantt) renderizados como SVG, inclusive na impressão.
   - **Notas de rodapé** — sintaxe `texto[^1]` + `[^1]: definição` (marked-footnote).
   - **Alertas GitHub** — `> [!NOTE] / [!TIP] / [!IMPORTANT] / [!WARNING] / [!CAUTION]` (marked-alert).
-  - **KaTeX** — fórmulas matemáticas com `$...$` ou `$$...$$`.
   - **Realce de código** — blocos com linguagem usam highlight.js (tema GitHub).
   - **Listas de tarefas** — `- [ ]` / `- [x]` estilizadas.
   - **Emojis por shortcode** — `:balance_scale:` → ⚖️, `:gavel:` → 🔨, etc.
