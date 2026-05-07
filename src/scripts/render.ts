@@ -3,7 +3,6 @@ import DOMPurify from 'dompurify';
 import markedFootnote from 'marked-footnote';
 import markedAlert from 'marked-alert';
 import { markedHighlight } from 'marked-highlight';
-import markedKatex from 'marked-katex-extension';
 import { markedEmoji } from 'marked-emoji';
 import hljs from 'highlight.js';
 import { EMOJI_MAP } from './emoji-map';
@@ -23,7 +22,6 @@ const marked = new Marked()
 	)
 	.use(markedFootnote())
 	.use(markedAlert())
-	.use(markedKatex({ throwOnError: false, nonStandard: true }))
 	.use(markedEmoji({ emojis, renderer: (token) => token.emoji }));
 
 marked.use({ breaks: true, gfm: true });

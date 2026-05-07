@@ -301,7 +301,7 @@ function packBlock(
 	const remaining = budget.contentHeight - currentY - (isFirstOnPage ? 0 : margins.top);
 
 	// Try paragraph split (preserves inline formatting).
-	if (block.tagName === 'P' && remaining > 0 && !block.querySelector('.katex,img,.mermaid-diagram')) {
+	if (block.tagName === 'P' && remaining > 0 && !block.querySelector('img,.mermaid-diagram')) {
 		const split = splitParagraph(block, remaining, budget.contentWidth);
 		if (split) {
 			pages[pages.length - 1].push(split.first);
