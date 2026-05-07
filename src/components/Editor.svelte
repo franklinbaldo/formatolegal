@@ -12,6 +12,7 @@
 
 	let markdown = $state('');
 	let theme = $state<Theme>('theme-default');
+	let numberedParagraphs = $state(false);
 	let renderedHtml = $state('');
 	let mobileTab = $state<'editor' | 'preview'>('editor');
 	let dragOver = $state(false);
@@ -37,6 +38,8 @@
 		if (saved) markdown = saved;
 		const savedTheme = localStorage.getItem(STORAGE_KEYS.theme);
 		if (savedTheme && isTheme(savedTheme)) theme = savedTheme;
+		const savedNumbered = localStorage.getItem(STORAGE_KEYS.numberedParagraphs);
+		if (savedNumbered === '1') numberedParagraphs = true;
 	});
 
 	$effect(() => {
@@ -45,6 +48,10 @@
 
 	$effect(() => {
 		localStorage.setItem(STORAGE_KEYS.theme, theme);
+	});
+
+	$effect(() => {
+		localStorage.setItem(STORAGE_KEYS.numberedParagraphs, numberedParagraphs ? '1' : '0');
 	});
 
 	$effect(() => {
@@ -145,6 +152,17 @@
 					</select>
 				</li>
 				<li>
+					<label class="numbered-toggle">
+						<input
+							id="numbered-paragraphs"
+							type="checkbox"
+							role="switch"
+							bind:checked={numberedParagraphs}
+						/>
+						Numerar §
+					</label>
+				</li>
+				<li>
 					<input
 						type="file"
 						id="file-upload"
@@ -233,6 +251,7 @@
 			<div
 				id="legal-preview-container"
 				class="legal-paper {theme}"
+				class:numbered-paragraphs={numberedParagraphs}
 				bind:this={previewEl}
 			>
 				{#if markdown.trim()}
@@ -248,7 +267,7 @@
 	</div>
 </div>
 
-<div class="page-container {theme}">
+<div class="page-container {theme}" class:numbered-paragraphs={numberedParagraphs}>
 	<!-- eslint-disable-next-line svelte/no-at-html-tags -- sanitized via DOMPurify in renderMarkdown -->
 	<article id="print-article">{@html printHtml}</article>
 </div>
@@ -364,11 +383,26 @@
 
 	.legal-paper {
 		background: white;
-		width: 210mm;
-		min-height: 297mm;
-		padding: 30mm 20mm 25mm 30mm;
+		width: var(--paper-width, 210mm);
+		min-height: var(--paper-height, 297mm);
+		padding: var(--margin-top, 30mm) var(--margin-right, 20mm) var(--margin-bottom, 25mm)
+			var(--margin-left, 30mm);
 		box-shadow: 0 15px 45px rgba(0, 0, 0, 0.15);
 		box-sizing: border-box;
+	}
+
+	.numbered-toggle {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.4rem;
+		margin: 0;
+		font-size: 0.875rem;
+		color: var(--pico-color);
+		white-space: nowrap;
+	}
+
+	.numbered-toggle :global(input) {
+		margin: 0;
 	}
 
 	.placeholder-msg {

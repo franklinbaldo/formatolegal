@@ -56,3 +56,20 @@ test('word count updates after input', async ({ page }) => {
 	await page.locator('#markdown-input').fill('uma duas tres quatro cinco');
 	await expect(page.locator('#status-bar')).toContainText('5 palavras');
 });
+
+test('all BR-legal themes are selectable', async ({ page }) => {
+	await page.goto('/formatolegal/');
+	for (const theme of ['theme-abnt', 'theme-cnj', 'theme-oab', 'theme-contrato']) {
+		await page.locator('#theme-select').selectOption(theme);
+		await expect(page.locator('#legal-preview-container')).toHaveClass(new RegExp(theme));
+	}
+});
+
+test('numbered paragraphs toggle adds class', async ({ page }) => {
+	await page.goto('/formatolegal/');
+	await page.locator('#markdown-input').fill('Primeiro.\n\nSegundo.\n\nTerceiro.');
+	const preview = page.locator('#legal-preview-container');
+	await expect(preview).not.toHaveClass(/numbered-paragraphs/);
+	await page.locator('#numbered-paragraphs').check();
+	await expect(preview).toHaveClass(/numbered-paragraphs/);
+});

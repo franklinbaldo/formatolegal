@@ -1,24 +1,29 @@
 export const THEMES = [
-  'theme-default',
-  'theme-classic',
-  'theme-modern',
-  'theme-minimal',
+	'theme-default',
+	'theme-classic',
+	'theme-abnt',
+	'theme-cnj',
+	'theme-oab',
+	'theme-contrato',
 ] as const;
 
 export type Theme = (typeof THEMES)[number];
 
 export const THEME_LABELS: Record<Theme, string> = {
-  'theme-default': 'Padrão (Lora/Mont)',
-  'theme-classic': 'Clássico (Times)',
-  'theme-modern': 'Moderno (Sans)',
-  'theme-minimal': 'Minimalista',
+	'theme-default': 'Padrão (Lora/Mont)',
+	'theme-classic': 'Clássico (Times)',
+	'theme-abnt': 'ABNT (Times 12, 1,5)',
+	'theme-cnj': 'CNJ / STF-STJ (Arial 12)',
+	'theme-oab': 'OAB Tradicional (numerais)',
+	'theme-contrato': 'Contrato (Times 11, cláusulas)',
 };
 
 export const STORAGE_KEYS = {
-  content: 'formatolegal_content',
-  theme: 'formatolegal_theme',
+	content: 'formatolegal_content',
+	theme: 'formatolegal_theme',
+	numberedParagraphs: 'formatolegal_numbered_paragraphs',
 } as const;
 
 export function isTheme(value: string): value is Theme {
-  return (THEMES as readonly string[]).includes(value);
+	return (THEMES as readonly string[]).includes(value);
 }

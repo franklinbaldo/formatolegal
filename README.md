@@ -8,7 +8,15 @@ Acesse: [https://franklinbaldo.github.io/formatolegal/](https://franklinbaldo.gi
 
 - **Editor em tempo real**: cole seu texto ou Markdown à esquerda e veja a formatação jurídica aplicada instantaneamente à direita.
 - **Identidade jurídica**: fontes elegantes (Lora e Montserrat), margens A4 precisas (30/20mm), recuo de parágrafo e citações destacadas.
-- **Temas**: alterne entre Padrão, Clássico (Times), Moderno (Sans) e Minimalista. A preferência é salva no navegador.
+- **Temas jurídicos brasileiros**: alterne entre os formatos comumente usados na advocacia brasileira. A preferência é salva no navegador.
+  - **Padrão** — Lora/Montserrat com identidade visual.
+  - **Clássico** — Times New Roman tradicional.
+  - **ABNT** — Times 12pt, espaçamento 1,5, margens 3/2/2/3cm, recuo 1,25cm (NBR 14724).
+  - **CNJ / STF-STJ** — Arial 12pt, 1,5, margens 3/2/2/3cm (Resolução CNJ 234).
+  - **OAB Tradicional** — Times 12, h2 numerado automaticamente em algarismos romanos (I, II, III...), recuo 2cm.
+  - **Contrato** — Times 11pt, single-spaced, listas ordenadas renderizadas como cláusulas hierárquicas (1.1, 1.2.3).
+- **Numerar parágrafos**: toggle independente que numera cada `<p>` automaticamente — útil para memoriais.
+- **Numeração de páginas em impressão**: rodapé "Pág. X de Y" via `@page` CSS (suportado em navegadores Chromium-based).
 - **Múltiplas formas de entrada**: copiar e colar, upload de arquivo `.md`/`.txt`/`.html` ou drag & drop diretamente no editor.
 - **Exportação**:
   - **Imprimir PDF** otimizado para A4.

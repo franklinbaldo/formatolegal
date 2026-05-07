@@ -130,6 +130,7 @@ const { title } = Astro.props;
 				padding: 0 10px;
 			}
 
+			/* === Tema Clássico === */
 			.theme-classic {
 				font-family: 'Times New Roman', Times, serif;
 			}
@@ -141,24 +142,200 @@ const { title } = Astro.props;
 				border-bottom: 1px solid #333;
 			}
 
-			.theme-modern {
-				font-family: 'Montserrat', sans-serif;
+			/* === Tema ABNT (Times 12, 1,5; margens 3/2/2/3) === */
+			.theme-abnt {
+				--margin-top: 30mm;
+				--margin-right: 20mm;
+				--margin-bottom: 20mm;
+				--margin-left: 30mm;
+				font-family: 'Times New Roman', Times, serif;
+				font-size: 12pt;
 				line-height: 1.5;
 			}
-			.theme-modern h2 {
-				border-left: 8px solid var(--primary-color);
-				background: #f8f9fa;
-				padding: 10px 20px;
-			}
-
-			.theme-minimal {
-				font-family: 'Lora', serif;
-			}
-			.theme-minimal h2 {
+			.theme-abnt h1,
+			.theme-abnt h2,
+			.theme-abnt h3,
+			.theme-abnt h4 {
+				font-family: 'Times New Roman', Times, serif;
+				color: #000;
+				text-transform: none;
 				border: none;
 				padding: 0;
-				text-decoration: underline;
-				text-underline-offset: 8px;
+				font-weight: 700;
+			}
+			.theme-abnt h1 {
+				font-size: 12pt;
+				text-transform: uppercase;
+				text-align: center;
+			}
+			.theme-abnt h2 {
+				font-size: 12pt;
+				text-transform: uppercase;
+			}
+			.theme-abnt h3 {
+				font-size: 12pt;
+			}
+			.theme-abnt p {
+				text-indent: 1.25cm;
+				margin-bottom: 0;
+				text-align: justify;
+			}
+
+			/* === Tema CNJ / STF-STJ (Arial 12, 1,5; margens 3/2/2/3) === */
+			.theme-cnj {
+				--margin-top: 30mm;
+				--margin-right: 20mm;
+				--margin-bottom: 20mm;
+				--margin-left: 30mm;
+				font-family: Arial, Helvetica, sans-serif;
+				font-size: 12pt;
+				line-height: 1.5;
+			}
+			.theme-cnj h1,
+			.theme-cnj h2,
+			.theme-cnj h3,
+			.theme-cnj h4 {
+				font-family: Arial, Helvetica, sans-serif;
+				color: #000;
+				text-transform: none;
+				border: none;
+				padding: 0;
+				font-weight: 700;
+			}
+			.theme-cnj h1 {
+				font-size: 12pt;
+				text-align: center;
+				text-transform: uppercase;
+			}
+			.theme-cnj h2 {
+				font-size: 12pt;
+				text-transform: uppercase;
+			}
+			.theme-cnj h3 {
+				font-size: 12pt;
+			}
+			.theme-cnj p {
+				text-indent: 1.25cm;
+				margin-bottom: 0;
+				text-align: justify;
+			}
+
+			/* === Tema OAB Tradicional (Times 12, 1,5; H2 numerado em romanos) === */
+			.theme-oab {
+				--margin-top: 30mm;
+				--margin-right: 20mm;
+				--margin-bottom: 30mm;
+				--margin-left: 30mm;
+				font-family: 'Times New Roman', Times, serif;
+				font-size: 12pt;
+				line-height: 1.5;
+				counter-reset: oab-section;
+			}
+			.theme-oab h1,
+			.theme-oab h2,
+			.theme-oab h3 {
+				font-family: 'Times New Roman', Times, serif;
+				color: #000;
+				border: none;
+				padding: 0;
+				font-weight: 700;
+			}
+			.theme-oab h1 {
+				font-size: 12pt;
+				text-align: center;
+				text-transform: uppercase;
+			}
+			.theme-oab h2 {
+				font-size: 12pt;
+				text-transform: uppercase;
+				counter-increment: oab-section;
+			}
+			.theme-oab h2::before {
+				content: counter(oab-section, upper-roman) '. ';
+			}
+			.theme-oab h3 {
+				font-size: 12pt;
+			}
+			.theme-oab p {
+				text-indent: 2cm;
+				margin-bottom: 0;
+				text-align: justify;
+			}
+
+			/* === Tema Contrato (Times 11, single, cláusulas hierárquicas) === */
+			.theme-contrato {
+				--margin-top: 25mm;
+				--margin-right: 20mm;
+				--margin-bottom: 25mm;
+				--margin-left: 25mm;
+				font-family: 'Times New Roman', Times, serif;
+				font-size: 11pt;
+				line-height: 1.25;
+			}
+			.theme-contrato h1,
+			.theme-contrato h2,
+			.theme-contrato h3 {
+				font-family: 'Times New Roman', Times, serif;
+				color: #000;
+				border: none;
+				padding: 0;
+				font-weight: 700;
+				text-transform: uppercase;
+				font-size: 11pt;
+			}
+			.theme-contrato h1 {
+				text-align: center;
+				margin-bottom: 1.5em;
+			}
+			.theme-contrato p {
+				text-indent: 0;
+				margin-bottom: 0.75em;
+				text-align: justify;
+			}
+			.theme-contrato ol {
+				counter-reset: clause;
+				list-style: none;
+				padding-left: 0;
+			}
+			.theme-contrato ol > li {
+				counter-increment: clause;
+				margin-bottom: 0.5em;
+				text-align: justify;
+			}
+			.theme-contrato ol > li::before {
+				content: counters(clause, '.') '. ';
+				font-weight: 700;
+				margin-right: 0.25em;
+			}
+
+			/* === Numeração de parágrafos (toggle independente) === */
+			.numbered-paragraphs article {
+				counter-reset: para;
+			}
+			.numbered-paragraphs article > p {
+				counter-increment: para;
+				position: relative;
+				padding-left: 2.5em;
+				text-indent: 0;
+			}
+			.numbered-paragraphs article > p::before {
+				content: counter(para) '.';
+				position: absolute;
+				left: 0;
+				font-weight: 700;
+				width: 2em;
+				text-align: right;
+			}
+
+			@page {
+				size: A4;
+				margin: 25mm 20mm;
+				@bottom-right {
+					content: 'Pág. ' counter(page) ' de ' counter(pages);
+					font-family: inherit;
+					font-size: 9pt;
+					color: #555;
+				}
 			}
 
 			@media print {
