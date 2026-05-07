@@ -11,26 +11,27 @@ import LegalLayout from '../layouts/LegalLayout.astro';
 			</div>
 			<div class="actions">
 				<div class="theme-selector">
-					<select id="theme-select">
-						<option value="theme-default">Padrão (Lora/Mont)</option>
-						<option value="theme-classic">Clássico (Times)</option>
-						<option value="theme-modern">Moderno (Sans)</option>
-						<option value="theme-minimal">Minimalista</option>
-					</select>
+					<select id="theme-select" aria-label="Tema"></select>
 				</div>
 				<input type="file" id="file-upload" accept=".md,.txt,.html" style="display: none;" />
 				<button id="upload-btn" class="secondary">Subir Arquivo</button>
+				<button id="download-html-btn" class="secondary">Baixar HTML</button>
 				<button id="clear-btn" class="secondary">Limpar</button>
 				<button id="print-btn" class="primary">Imprimir PDF</button>
 			</div>
 		</div>
-		
+
+		<div class="mobile-tabs">
+			<button id="tab-editor" class="active" type="button">Editor</button>
+			<button id="tab-preview" type="button">Visualização</button>
+		</div>
+
 		<div class="main-split">
 			<div class="editor-pane">
 				<div class="pane-header">
 					<span>Markdown / Texto</span>
 					<div class="template-selector">
-						<select id="template-select">
+						<select id="template-select" aria-label="Modelo">
 							<option value="">Carregar Exemplo...</option>
 							<option value="apelacao">Apelação Cível</option>
 							<option value="contestacao">Contestação</option>
@@ -39,13 +40,13 @@ import LegalLayout from '../layouts/LegalLayout.astro';
 				</div>
 				<textarea id="markdown-input" placeholder="Cole seu Markdown aqui..."></textarea>
 			</div>
-			
+
 			<div class="preview-pane">
 				<div class="pane-header">
 					<span>Visualização em A4</span>
+					<div id="status-bar" class="status-bar"></div>
 				</div>
 				<div id="legal-preview-container" class="legal-paper">
-					<!-- Preview content will be injected here -->
 					<div class="placeholder-msg">
 						<p>O resultado da formatação jurídica aparecerá aqui em tempo real.</p>
 					</div>
@@ -54,13 +55,11 @@ import LegalLayout from '../layouts/LegalLayout.astro';
 		</div>
 	</div>
 
-	<!-- Print container - only visible during print -->
 	<div class="page-container theme-default">
 		<article id="print-article"></article>
 	</div>
 
 	<style>
-		/* Editor specific styles - will not be printed */
 		.editor-interface {
 			display: flex;
 			flex-direction: column;
@@ -74,14 +73,16 @@ import LegalLayout from '../layouts/LegalLayout.astro';
 		}
 
 		.toolbar {
-			height: 60px;
+			min-height: 60px;
 			background: #1a2a44;
 			display: flex;
 			justify-content: space-between;
 			align-items: center;
 			padding: 0 20px;
 			color: white;
-			box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+			box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+			flex-wrap: wrap;
+			gap: 8px;
 		}
 
 		.logo {
@@ -102,6 +103,7 @@ import LegalLayout from '../layouts/LegalLayout.astro';
 		.actions {
 			display: flex;
 			gap: 10px;
+			flex-wrap: wrap;
 		}
 
 		button {
@@ -123,13 +125,32 @@ import LegalLayout from '../layouts/LegalLayout.astro';
 		}
 
 		.secondary {
-			background: rgba(255,255,255,0.1);
+			background: rgba(255, 255, 255, 0.1);
 			color: white;
-			border: 1px solid rgba(255,255,255,0.2);
+			border: 1px solid rgba(255, 255, 255, 0.2);
 		}
 
 		.secondary:hover {
-			background: rgba(255,255,255,0.2);
+			background: rgba(255, 255, 255, 0.2);
+		}
+
+		.mobile-tabs {
+			display: none;
+			background: #f1f3f5;
+			border-bottom: 1px solid #ddd;
+		}
+
+		.mobile-tabs button {
+			flex: 1;
+			background: transparent;
+			color: #555;
+			border-radius: 0;
+			border-bottom: 2px solid transparent;
+		}
+
+		.mobile-tabs button.active {
+			color: #1a2a44;
+			border-bottom-color: #3a7bd5;
 		}
 
 		.main-split {
@@ -144,6 +165,11 @@ import LegalLayout from '../layouts/LegalLayout.astro';
 			flex-direction: column;
 			border-right: 1px solid #ddd;
 			background: white;
+			transition: background-color 0.15s;
+		}
+
+		.editor-pane.drag-over {
+			background: #f0f7ff;
 		}
 
 		.preview-pane {
@@ -152,7 +178,10 @@ import LegalLayout from '../layouts/LegalLayout.astro';
 			flex-direction: column;
 			background: #e9ecef;
 			overflow-y: auto;
-			padding: 40px;
+		}
+
+		.preview-pane > .legal-paper {
+			margin: 40px auto;
 		}
 
 		.pane-header {
@@ -166,6 +195,12 @@ import LegalLayout from '../layouts/LegalLayout.astro';
 			font-weight: 700;
 			text-transform: uppercase;
 			color: #666;
+		}
+
+		.status-bar {
+			font-weight: 500;
+			text-transform: none;
+			color: #888;
 		}
 
 		textarea {
@@ -184,9 +219,8 @@ import LegalLayout from '../layouts/LegalLayout.astro';
 			background: white;
 			width: 210mm;
 			min-height: 297mm;
-			margin: 0 auto;
 			padding: 30mm 20mm 25mm 30mm;
-			box-shadow: 0 15px 45px rgba(0,0,0,0.15);
+			box-shadow: 0 15px 45px rgba(0, 0, 0, 0.15);
 			box-sizing: border-box;
 		}
 
@@ -200,16 +234,38 @@ import LegalLayout from '../layouts/LegalLayout.astro';
 			text-align: center;
 		}
 
-		/* Hide the default slot-based page-container from layout when in editor mode */
-		:global(.page-container) {
+		:global(body > .page-container) {
 			display: none;
+		}
+
+		@media (max-width: 900px) {
+			.mobile-tabs {
+				display: flex;
+			}
+			.main-split {
+				flex-direction: column;
+			}
+			.editor-pane {
+				width: 100%;
+				border-right: none;
+				border-bottom: 1px solid #ddd;
+			}
+			.editor-pane.mobile-hidden,
+			.preview-pane.mobile-hidden {
+				display: none;
+			}
+			.legal-paper {
+				width: 100%;
+				min-height: 0;
+				padding: 20mm 12mm;
+			}
 		}
 
 		@media print {
 			.no-print {
 				display: none !important;
 			}
-			:global(.page-container) {
+			:global(body > .page-container) {
 				display: block !important;
 			}
 			body {
@@ -220,174 +276,6 @@ import LegalLayout from '../layouts/LegalLayout.astro';
 	</style>
 
 	<script>
-		import { marked } from 'marked';
-
-		const input = document.getElementById('markdown-input') as HTMLTextAreaElement;
-		const preview = document.getElementById('legal-preview-container') as HTMLDivElement;
-		const printBtn = document.getElementById('print-btn') as HTMLButtonElement;
-		const clearBtn = document.getElementById('clear-btn') as HTMLButtonElement;
-		const uploadBtn = document.getElementById('upload-btn') as HTMLButtonElement;
-		const fileInput = document.getElementById('file-upload') as HTMLInputElement;
-		const templateSelect = document.getElementById('template-select') as HTMLSelectElement;
-		const themeSelect = document.getElementById('theme-select') as HTMLSelectElement;
-
-		// Handle Theme Change
-		themeSelect.addEventListener('change', (e: any) => {
-			const theme = e.target.value;
-			
-			// Apply to preview
-			preview.className = 'legal-paper ' + theme;
-			
-			// Apply to print container (Layout)
-			const pageContainer = document.querySelector('.page-container');
-			if (pageContainer) {
-				pageContainer.className = 'page-container ' + theme;
-			}
-			
-			localStorage.setItem('formatolegal_theme', theme);
-		});
-
-		// Handle Upload
-		uploadBtn.addEventListener('click', () => fileInput.click());
-		fileInput.addEventListener('change', (e: any) => {
-			const file = e.target.files[0];
-			if (!file) return;
-			
-			const reader = new FileReader();
-			reader.onload = (e: any) => {
-				input.value = e.target.result;
-				updatePreview();
-			};
-			reader.readAsText(file);
-		});
-
-		// Handle Drag & Drop
-		const editorPane = document.querySelector('.editor-pane') as HTMLDivElement;
-		editorPane.addEventListener('dragover', (e) => {
-			e.preventDefault();
-			editorPane.style.background = '#f0f7ff';
-		});
-		editorPane.addEventListener('dragleave', () => {
-			editorPane.style.background = 'white';
-		});
-		editorPane.addEventListener('drop', (e: any) => {
-			e.preventDefault();
-			editorPane.style.background = 'white';
-			const file = e.dataTransfer.files[0];
-			if (file) {
-				const reader = new FileReader();
-				reader.onload = (e: any) => {
-					input.value = e.target.result;
-					updatePreview();
-				};
-				reader.readAsText(file);
-			}
-		});
-
-		// Set options for marked
-		marked.use({
-			breaks: true,
-			gfm: true
-		});
-
-		async function updatePreview() {
-			const rawValue = input.value;
-			if (!rawValue.trim()) {
-				preview.innerHTML = '<div class="placeholder-msg"><p>O resultado da formatação jurídica aparecerá aqui em tempo real.</p></div>';
-				return;
-			}
-			
-			const htmlContent = await marked.parse(rawValue);
-			preview.innerHTML = `<article class="petition-content">${htmlContent}</article>`;
-			
-			// Auto-save to local storage
-			localStorage.setItem('formatolegal_content', rawValue);
-		}
-
-		input.addEventListener('input', updatePreview);
-
-		printBtn.addEventListener('click', async () => {
-			// Copy content to the hidden print container
-			const printArticle = document.getElementById('print-article');
-			if (printArticle) {
-				printArticle.innerHTML = await marked.parse(input.value);
-			}
-			window.print();
-		});
-
-		clearBtn.addEventListener('click', () => {
-			if (confirm('Deseja limpar todo o conteúdo?')) {
-				input.value = '';
-				updatePreview();
-			}
-		});
-
-		// Templates
-		const templates: Record<string, string> = {
-			apelacao: `# EXCELENTÍSSIMO SENHOR DOUTOR JUIZ DE DIREITO DA...
-
-Autos nº 0001234-56.2024.8.22.0001
-Apelante: [NOME DO APELANTE]
-Apelado: [NOME DO APELADO]
-
-O **[NOME DA PARTE]**, já qualificado nos autos em epígrafe, vem, por intermédio de seu advogado, interpor
-
-**APELAÇÃO**
-
-em face da r. sentença de fls., requerendo sua remessa ao Egrégio Tribunal de Justiça, pelas razões anexas.
-
----
-
-## RAZÕES RECURSAIS
-
-**Egrégio Tribunal,**
-**Colenda Câmara,**
-**Ínclitos Desembargadores.**
-
-### I. BREVE SÍNTESE DO PROCESSO
-A presente demanda versa sobre... (Texto longo para demonstrar a primeira página).
-
-### II. DO CABIMENTO E TEMPESTIVIDADE
-O presente recurso é cabível vez que a decisão foi publicada em...
-
----
-
-### III. DO MÉRITO
-O apelante busca a reforma da decisão pois houve erro in procedendo...
-
-> "A justiça atrasada não é justiça; senão injustiça qualificada e manifesta." - Rui Barbosa.
-
-### IV. DOS PEDIDOS
-Ante o exposto, requer o conhecimento e provimento do recurso para reformar a decisão recorrida.
-
-Local, Data.
-Advogado / OAB`,
-			contestacao: `# EXCELENTÍSSIMO SENHOR DOUTOR JUIZ...
-
-CONTESTAÇÃO...`
-		};
-
-		templateSelect.addEventListener('change', (e) => {
-			const val = e.target.value;
-			if (val && templates[val]) {
-				input.value = templates[val];
-				updatePreview();
-			}
-		});
-
-		// Load saved content and theme
-		window.addEventListener('load', () => {
-			const savedContent = localStorage.getItem('formatolegal_content');
-			if (savedContent) {
-				input.value = savedContent;
-				updatePreview();
-			}
-
-			const savedTheme = localStorage.getItem('formatolegal_theme');
-			if (savedTheme) {
-				themeSelect.value = savedTheme;
-				themeSelect.dispatchEvent(new Event('change'));
-			}
-		});
+		import '../scripts/editor.ts';
 	</script>
 </LegalLayout>
