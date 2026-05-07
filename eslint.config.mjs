@@ -1,6 +1,8 @@
 import js from '@eslint/js';
 import tseslint from 'typescript-eslint';
 import astro from 'eslint-plugin-astro';
+import svelte from 'eslint-plugin-svelte';
+import svelteParser from 'svelte-eslint-parser';
 
 export default [
 	{
@@ -9,6 +11,16 @@ export default [
 	js.configs.recommended,
 	...tseslint.configs.recommended,
 	...astro.configs.recommended,
+	...svelte.configs['flat/recommended'],
+	{
+		files: ['**/*.svelte'],
+		languageOptions: {
+			parser: svelteParser,
+			parserOptions: {
+				parser: tseslint.parser,
+			},
+		},
+	},
 	{
 		languageOptions: {
 			globals: {
@@ -26,9 +38,12 @@ export default [
 				Blob: 'readonly',
 				URL: 'readonly',
 				Event: 'readonly',
+				DragEvent: 'readonly',
+				KeyboardEvent: 'readonly',
 				confirm: 'readonly',
 				setTimeout: 'readonly',
 				clearTimeout: 'readonly',
+				requestAnimationFrame: 'readonly',
 			},
 		},
 		rules: {

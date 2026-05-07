@@ -10,17 +10,19 @@
     "build": "astro build",
     "preview": "astro preview",
     "astro": "astro",
-    "check": "astro check",
+    "check": "astro check && svelte-check --tsconfig ./tsconfig.json",
     "lint": "eslint .",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "test": "playwright test"
   },
   "dependencies": {
+    "@astrojs/svelte": "^8.1.0",
     "@picocss/pico": "^2.1.1",
     "astro": "^6.1.10",
     "dompurify": "^3.2.0",
-    "marked": "^18.0.3"
+    "marked": "^18.0.3",
+    "svelte": "^5.55.5"
   },
   "devDependencies": {
     "@astrojs/check": "^0.9.9",
@@ -29,8 +31,11 @@
     "@types/node": "^25.6.0",
     "eslint": "^9.10.0",
     "eslint-plugin-astro": "^1.2.4",
+    "eslint-plugin-svelte": "^3.17.1",
     "prettier": "^3.3.3",
     "prettier-plugin-astro": "^0.14.1",
+    "svelte-check": "^4.4.8",
+    "svelte-eslint-parser": "^1.6.1",
     "typescript": "^5.9.3",
     "typescript-eslint": "^8.0.0"
   }
