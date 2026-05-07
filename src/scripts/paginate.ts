@@ -1,13 +1,11 @@
 // Page layout for the live preview: walks the rendered article, measures each
-// top-level block via DOM, and packs blocks into A4-sized pages. When a plain
-// paragraph would overflow the current page, pretext is used to decide the
-// line index where it should be split (no DOM reflow per measurement).
+// top-level block via DOM, and packs blocks into A4-sized pages. Pages are
+// filled eagerly: paragraphs (including ones with inline formatting), lists,
+// and blockquotes are split so each page fills as much vertical space as it
+// can. Pretext finds the line index where a paragraph crosses a page boundary
+// without DOM thrashing.
 
 import { prepareWithSegments, layoutNextLineRange, type LayoutCursor } from '@chenglou/pretext';
-
-export interface PaginateResult {
-	pagesHtml: string[];
-}
 
 const MEASURER_ID = '__formatolegal_paginator';
 
@@ -32,12 +30,9 @@ function getMeasurer(themeClass: string): { container: HTMLElement; article: HTM
 }
 
 function canvasFontFromComputed(cs: CSSStyleDeclaration): string {
-	// Canvas font format: "[style] [variant] [weight] size/lineHeight family"
 	const style = cs.fontStyle && cs.fontStyle !== 'normal' ? cs.fontStyle : '';
 	const weight = cs.fontWeight && cs.fontWeight !== 'normal' ? cs.fontWeight : '';
-	const size = cs.fontSize;
-	const family = cs.fontFamily;
-	return [style, weight, `${size}`, family].filter(Boolean).join(' ');
+	return [style, weight, cs.fontSize, cs.fontFamily].filter(Boolean).join(' ');
 }
 
 function pxOr(value: string, fallback: number): number {
@@ -60,77 +55,285 @@ function measureBudget(container: HTMLElement, article: HTMLElement): PageBudget
 	return { contentHeight, contentWidth };
 }
 
-interface SplitResult {
-	beforeText: string;
-	afterText: string;
+// ---------------------------------------------------------------------------
+// Splitting primitives
+// ---------------------------------------------------------------------------
+
+interface ParagraphSplit {
+	first: HTMLElement;
+	second: HTMLElement;
+	secondEstimatedHeight: number;
 }
 
-function splitPlainParagraph(
-	text: string,
-	fontStr: string,
-	maxWidth: number,
-	lineHeight: number,
+// Convert a pretext (segmentIndex, graphemeIndex) cursor into a UTF-16
+// character offset in the original text. Grapheme indices are resolved via
+// Intl.Segmenter so the math survives multi-codepoint emoji / combining marks.
+const graphemeSegmenter = typeof Intl !== 'undefined' && 'Segmenter' in Intl
+	? new Intl.Segmenter(undefined, { granularity: 'grapheme' })
+	: null;
+
+function cursorToCharOffset(
+	segments: string[],
+	cursor: LayoutCursor,
+): number {
+	let offset = 0;
+	for (let i = 0; i < cursor.segmentIndex && i < segments.length; i++) {
+		offset += segments[i].length;
+	}
+	if (cursor.segmentIndex < segments.length && cursor.graphemeIndex > 0) {
+		const seg = segments[cursor.segmentIndex];
+		if (graphemeSegmenter) {
+			let g = 0;
+			for (const piece of graphemeSegmenter.segment(seg)) {
+				if (g === cursor.graphemeIndex) break;
+				offset += piece.segment.length;
+				g++;
+			}
+		} else {
+			offset += Math.min(cursor.graphemeIndex, seg.length);
+		}
+	}
+	return offset;
+}
+
+// Split a paragraph (with or without inline children) into two paragraphs at
+// the line index that fits in `availableHeight`. Inline formatting (strong,
+// em, links, code, …) is preserved; cuts snap to whitespace and never go
+// inside an inline element.
+function splitParagraph(
+	p: HTMLElement,
 	availableHeight: number,
-): SplitResult | null {
+	contentWidth: number,
+): ParagraphSplit | null {
+	// Hard line breaks (`<br>`) aren't represented in textContent, so pretext
+	// would under-count lines. Bail and let the block flow to the next page.
+	if (p.querySelector('br')) return null;
+
+	const cs = getComputedStyle(p);
+	const lineHeight = pxOr(cs.lineHeight, pxOr(cs.fontSize, 16) * 1.5);
 	const linesThatFit = Math.floor(availableHeight / lineHeight);
 	if (linesThatFit < 1) return null;
 
-	const prepared = prepareWithSegments(text, fontStr);
+	const fontStr = canvasFontFromComputed(cs);
+	const fullText = p.textContent ?? '';
+	if (!fullText.trim()) return null;
+
+	const prepared = prepareWithSegments(fullText, fontStr);
 	let cursor: LayoutCursor = { segmentIndex: 0, graphemeIndex: 0 };
 	let lastEnd: LayoutCursor | null = null;
 	for (let i = 0; i < linesThatFit; i++) {
-		const next = layoutNextLineRange(prepared, cursor, maxWidth);
-		if (!next) return null; // text fits in fewer lines than budget — no split needed
+		const next = layoutNextLineRange(prepared, cursor, contentWidth);
+		if (!next) return null; // fits without split
 		lastEnd = next.end;
 		cursor = next.end;
 	}
 	if (!lastEnd) return null;
 
-	// Map (segmentIndex, graphemeIndex) → character offset in the original text.
-	const segments = prepared.segments;
-	let charOffset = 0;
-	for (let i = 0; i < lastEnd.segmentIndex && i < segments.length; i++) {
-		charOffset += segments[i].length;
+	const cutOffset = cursorToCharOffset(prepared.segments, lastEnd);
+
+	// Walk DOM children, find the node that straddles `cutOffset`.
+	const first = p.cloneNode(false) as HTMLElement;
+	const second = p.cloneNode(false) as HTMLElement;
+	first.classList.add('paginated-slice');
+	second.classList.add('paginated-continuation');
+
+	let consumed = 0;
+	let split = false;
+	for (const child of Array.from(p.childNodes)) {
+		if (split) {
+			second.appendChild(child.cloneNode(true));
+			continue;
+		}
+		const childText = child.textContent ?? '';
+		if (consumed + childText.length <= cutOffset) {
+			first.appendChild(child.cloneNode(true));
+			consumed += childText.length;
+			continue;
+		}
+		// This child straddles the cut.
+		if (child.nodeType === 3) {
+			// Text node: snap the cut backward to the last whitespace at-or-before
+			// localCut so the first slice never extends past the line we already
+			// committed to. Fall back to a forward snap if the line has no leading
+			// whitespace (single very long word).
+			const localCut = Math.max(0, cutOffset - consumed);
+			const txt = childText;
+			let snap = localCut;
+			while (snap > 0 && !/\s/.test(txt[snap - 1])) snap--;
+			if (snap === 0) {
+				snap = localCut;
+				while (snap < txt.length && !/\s/.test(txt[snap])) snap++;
+			}
+			const beforeText = txt.slice(0, snap).trimEnd();
+			const afterText = txt.slice(snap).trimStart();
+			if (beforeText) first.appendChild(document.createTextNode(beforeText));
+			if (afterText) second.appendChild(document.createTextNode(afterText));
+		} else {
+			// Element node: cut before it (don't split inline elements).
+			second.appendChild(child.cloneNode(true));
+		}
+		split = true;
 	}
-	if (lastEnd.segmentIndex < segments.length) {
-		charOffset += Math.min(lastEnd.graphemeIndex, segments[lastEnd.segmentIndex].length);
+
+	if (!first.textContent?.trim() || !second.textContent?.trim()) return null;
+
+	const remainderText = second.textContent ?? '';
+	const remainderPrepared = prepareWithSegments(remainderText, fontStr);
+	let remainderLines = 0;
+	let walk: LayoutCursor = { segmentIndex: 0, graphemeIndex: 0 };
+	while (true) {
+		const next = layoutNextLineRange(remainderPrepared, walk, contentWidth);
+		if (!next) break;
+		walk = next.end;
+		remainderLines++;
+	}
+	const marginBottom = pxOr(cs.marginBottom, 0);
+	return {
+		first,
+		second,
+		secondEstimatedHeight: remainderLines * lineHeight + marginBottom,
+	};
+}
+
+interface ContainerSplit {
+	first: HTMLElement;
+	second: HTMLElement;
+	secondHeight: number;
+}
+
+// Split a container element (ul, ol, blockquote) by its block children
+// (li for lists, child blocks for blockquote) so its first half fills the
+// available space and its second half goes on the next page.
+function splitContainer(
+	el: HTMLElement,
+	availableHeight: number,
+): ContainerSplit | null {
+	const childTag = el.tagName === 'OL' || el.tagName === 'UL' ? 'LI' : null;
+	const children = Array.from(el.children) as HTMLElement[];
+	if (children.length < 2) return null;
+
+	const elRect = el.getBoundingClientRect();
+	const containerCS = getComputedStyle(el);
+	const padTop = pxOr(containerCS.paddingTop, 0);
+	const padBottom = pxOr(containerCS.paddingBottom, 0);
+	const borderTop = pxOr(containerCS.borderTopWidth, 0);
+	const borderBottom = pxOr(containerCS.borderBottomWidth, 0);
+	const marginBottom = pxOr(containerCS.marginBottom, 0);
+	// childBottoms below are measured from the container's outer top edge, so
+	// they already include the container's top border + top padding. Only the
+	// bottom chrome remains to be added when checking how much of the page the
+	// first slice consumes.
+	const bottomChrome = padBottom + borderBottom;
+	// Reserve margin-bottom: the cloned first slice keeps it, and that space
+	// has to fit on the current page too.
+	const heightBudget = availableHeight - marginBottom;
+	if (heightBudget <= 0) return null;
+
+	// Cumulative bottom offset of each child relative to the container's top.
+	const childBottoms: number[] = [];
+	for (const child of children) {
+		const r = child.getBoundingClientRect();
+		childBottoms.push(r.bottom - elRect.top);
 	}
 
-	// Snap to the next whitespace so we never break mid-word.
-	let cut = charOffset;
-	while (cut < text.length && !/\s/.test(text[cut])) cut++;
-	const before = text.slice(0, cut).trimEnd();
-	const after = text.slice(cut).trimStart();
-	if (!before || !after) return null;
-	return { beforeText: before, afterText: after };
+	let cutIdx = -1;
+	for (let i = 0; i < childBottoms.length; i++) {
+		if (childBottoms[i] + bottomChrome <= heightBudget) cutIdx = i;
+		else break;
+	}
+	if (cutIdx < 0 || cutIdx >= children.length - 1) return null;
+
+	const first = el.cloneNode(false) as HTMLElement;
+	const second = el.cloneNode(false) as HTMLElement;
+	first.classList.add('paginated-slice');
+	second.classList.add('paginated-continuation');
+
+	for (let i = 0; i <= cutIdx; i++) first.appendChild(children[i].cloneNode(true));
+	for (let i = cutIdx + 1; i < children.length; i++) second.appendChild(children[i].cloneNode(true));
+
+	// Preserve ordered-list numbering across the page break: the continuation's
+	// `start` is the original `start` (default 1) plus the number of items
+	// already on the previous page.
+	if (childTag === 'LI' && el.tagName === 'OL') {
+		const originalStart = parseInt(el.getAttribute('start') ?? '1', 10) || 1;
+		(second as HTMLOListElement).start = originalStart + cutIdx + 1;
+		// For themes that rely on CSS counters, also drive a CSS custom property
+		// so they can pick the right offset (e.g. `counter-reset: item var(--continuation-start)`).
+		second.style.setProperty('--continuation-start', String(originalStart + cutIdx + 1));
+	}
+
+	const lastBottom = childBottoms[childBottoms.length - 1];
+	// The continuation re-renders the full container chrome (top + bottom
+	// padding/borders), so include both when reporting its height.
+	const secondHeight = (lastBottom - childBottoms[cutIdx]) + padTop + padBottom + borderTop + borderBottom;
+
+	return { first, second, secondHeight };
 }
 
-function isPlainParagraph(el: HTMLElement): boolean {
-	if (el.tagName !== 'P') return false;
-	if (el.children.length !== 0) return false;
-	if ((el.textContent ?? '').trim().length < 80) return false;
-	return true;
+// ---------------------------------------------------------------------------
+// Pagination loop
+// ---------------------------------------------------------------------------
+
+function getMargins(el: HTMLElement): { top: number; bottom: number } {
+	const cs = getComputedStyle(el);
+	return { top: pxOr(cs.marginTop, 0), bottom: pxOr(cs.marginBottom, 0) };
 }
 
-function makeContinuation(p: HTMLElement, text: string): HTMLElement {
-	const clone = p.cloneNode(false) as HTMLElement;
-	clone.textContent = text;
-	clone.classList.add('paginated-continuation');
-	return clone;
-}
+const SPLITTABLE_CONTAINERS = new Set(['UL', 'OL', 'BLOCKQUOTE']);
+const ATOMIC_TAGS = new Set(['PRE', 'TABLE', 'IMG', 'FIGURE']);
 
-function makeSliced(p: HTMLElement, text: string): HTMLElement {
-	const clone = p.cloneNode(false) as HTMLElement;
-	clone.textContent = text;
-	clone.classList.add('paginated-slice');
-	return clone;
+function packBlock(
+	block: HTMLElement,
+	pages: HTMLElement[][],
+	currentY: number,
+	budget: PageBudget,
+): number {
+	const margins = getMargins(block);
+	const blockHeight = block.getBoundingClientRect().height;
+	const isFirstOnPage = currentY === 0;
+	const totalHeight = isFirstOnPage ? blockHeight + margins.bottom : margins.top + blockHeight + margins.bottom;
+
+	if (totalHeight <= budget.contentHeight - currentY) {
+		pages[pages.length - 1].push(block);
+		return currentY + totalHeight;
+	}
+
+	const remaining = budget.contentHeight - currentY - (isFirstOnPage ? 0 : margins.top);
+
+	// Try paragraph split (preserves inline formatting).
+	if (block.tagName === 'P' && remaining > 0 && !block.querySelector('.katex,img,.mermaid-diagram')) {
+		const split = splitParagraph(block, remaining, budget.contentWidth);
+		if (split) {
+			pages[pages.length - 1].push(split.first);
+			pages.push([split.second]);
+			return split.secondEstimatedHeight;
+		}
+	}
+
+	// Try container split (lists, blockquotes).
+	if (SPLITTABLE_CONTAINERS.has(block.tagName) && remaining > 0) {
+		const split = splitContainer(block, remaining);
+		if (split) {
+			pages[pages.length - 1].push(split.first);
+			pages.push([split.second]);
+			return split.secondHeight + margins.bottom;
+		}
+	}
+
+	// Atomic / unsplittable block — push to a fresh page.
+	if (!ATOMIC_TAGS.has(block.tagName) && pages[pages.length - 1].length === 0) {
+		// Empty page and the block still doesn't fit: place it anyway (overflows).
+		pages[pages.length - 1].push(block);
+		return blockHeight + margins.bottom;
+	}
+	pages.push([block]);
+	return blockHeight + margins.bottom;
 }
 
 export function paginate(html: string, themeClass: string): string[] {
 	if (!html.trim()) return [];
 	const { container, article } = getMeasurer(themeClass);
 	article.innerHTML = html;
-	// Force layout — required for getBoundingClientRect on children.
 	void article.offsetHeight;
 
 	const budget = measureBudget(container, article);
@@ -146,62 +349,10 @@ export function paginate(html: string, themeClass: string): string[] {
 			}
 			continue;
 		}
-
-		const cs = getComputedStyle(block);
-		const marginTop = pxOr(cs.marginTop, 0);
-		const marginBottom = pxOr(cs.marginBottom, 0);
-		const blockHeight = block.getBoundingClientRect().height;
-		const totalHeight = marginTop + blockHeight + marginBottom;
-
-		if (currentY === 0) {
-			// First block on a page: collapse top margin (matches CSS page break behavior).
-			const collapsed = blockHeight + marginBottom;
-			if (collapsed <= budget.contentHeight) {
-				pages[pages.length - 1].push(block);
-				currentY = collapsed;
-				continue;
-			}
-		} else if (currentY + totalHeight <= budget.contentHeight) {
-			pages[pages.length - 1].push(block);
-			currentY += totalHeight;
-			continue;
-		}
-
-		const remaining = budget.contentHeight - currentY - marginTop;
-		if (remaining > 0 && isPlainParagraph(block)) {
-			const fontStr = canvasFontFromComputed(cs);
-			const lineHeight = pxOr(cs.lineHeight, pxOr(cs.fontSize, 16) * 1.5);
-			const split = splitPlainParagraph(
-				block.textContent ?? '',
-				fontStr,
-				budget.contentWidth,
-				lineHeight,
-				remaining,
-			);
-			if (split) {
-				pages[pages.length - 1].push(makeSliced(block, split.beforeText));
-				pages.push([makeContinuation(block, split.afterText)]);
-				// Estimate carryover height with pretext.
-				const preparedRemainder = prepareWithSegments(split.afterText, fontStr);
-				let lineCount = 0;
-				let walk: LayoutCursor = { segmentIndex: 0, graphemeIndex: 0 };
-				while (true) {
-					const next = layoutNextLineRange(preparedRemainder, walk, budget.contentWidth);
-					if (!next) break;
-					walk = next.end;
-					lineCount++;
-				}
-				currentY = lineCount * lineHeight + marginBottom;
-				continue;
-			}
-		}
-
-		pages.push([block]);
-		currentY = blockHeight + marginBottom;
+		currentY = packBlock(block, pages, currentY, budget);
 	}
 
-	const html_pages = pages
+	return pages
 		.filter((p) => p.length > 0)
 		.map((blocks) => blocks.map((b) => b.outerHTML).join(''));
-	return html_pages;
 }
