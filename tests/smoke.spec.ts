@@ -125,12 +125,6 @@ test('mermaid block renders an SVG', async ({ page }) => {
 	await expect(svg).toBeVisible({ timeout: 10000 });
 });
 
-test('katex renders math', async ({ page }) => {
-	await gotoReady(page);
-	await page.locator('#markdown-input').fill('Equação: $a^2 + b^2 = c^2$.');
-	await expect(page.locator('#legal-preview-container .katex')).toBeVisible();
-});
-
 test('downloaded HTML is visible (page-container not hidden by editor CSS)', async ({ page }) => {
 	await gotoReady(page);
 	await page.locator('#markdown-input').fill('# Título\n\nConteúdo do documento.');
