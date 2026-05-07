@@ -183,7 +183,12 @@ function splitContainer(
 	const containerCS = getComputedStyle(el);
 	const padTop = pxOr(containerCS.paddingTop, 0);
 	const padBottom = pxOr(containerCS.paddingBottom, 0);
+	const marginBottom = pxOr(containerCS.marginBottom, 0);
 	const containerOverhead = padTop + padBottom;
+	// Reserve margin-bottom: the cloned first slice keeps it, and that space
+	// has to fit on the current page too.
+	const heightBudget = availableHeight - marginBottom;
+	if (heightBudget <= 0) return null;
 
 	// Cumulative bottom offset of each child relative to the container's top.
 	const childBottoms: number[] = [];
@@ -194,7 +199,7 @@ function splitContainer(
 
 	let cutIdx = -1;
 	for (let i = 0; i < childBottoms.length; i++) {
-		if (childBottoms[i] + containerOverhead <= availableHeight) cutIdx = i;
+		if (childBottoms[i] + containerOverhead <= heightBudget) cutIdx = i;
 		else break;
 	}
 	if (cutIdx < 0 || cutIdx >= children.length - 1) return null;
@@ -207,9 +212,15 @@ function splitContainer(
 	for (let i = 0; i <= cutIdx; i++) first.appendChild(children[i].cloneNode(true));
 	for (let i = cutIdx + 1; i < children.length; i++) second.appendChild(children[i].cloneNode(true));
 
-	// For ordered lists, preserve numbering on the continuation.
+	// Preserve ordered-list numbering across the page break: the continuation's
+	// `start` is the original `start` (default 1) plus the number of items
+	// already on the previous page.
 	if (childTag === 'LI' && el.tagName === 'OL') {
-		(second as HTMLOListElement).start = (cutIdx + 2);
+		const originalStart = parseInt(el.getAttribute('start') ?? '1', 10) || 1;
+		(second as HTMLOListElement).start = originalStart + cutIdx + 1;
+		// For themes that rely on CSS counters, also drive a CSS custom property
+		// so they can pick the right offset (e.g. `counter-reset: item var(--continuation-start)`).
+		second.style.setProperty('--continuation-start', String(originalStart + cutIdx + 1));
 	}
 
 	const firstHeight = childBottoms[cutIdx] + containerOverhead;
