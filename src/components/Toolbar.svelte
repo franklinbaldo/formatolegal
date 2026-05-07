@@ -41,7 +41,9 @@
 
 	$effect(() => {
 		if (!menuOpen) return;
+		// eslint-disable-next-line no-undef
 		const onDocClick = (e: MouseEvent) => {
+			// eslint-disable-next-line no-undef
 			const t = e.target as Node;
 			if (menuEl && !menuEl.contains(t) && toggleEl && !toggleEl.contains(t)) closeMenu();
 		};
