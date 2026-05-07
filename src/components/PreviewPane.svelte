@@ -11,8 +11,10 @@
 	const A4_HEIGHT_PX = 1123;
 	const pageEstimate = $derived.by(() => {
 		if (!previewEl) return 1;
-		// Use scrollHeight for a better physical estimate
-		return Math.max(1, Math.ceil(previewEl.scrollHeight / A4_HEIGHT_PX));
+		// Use scrollHeight of the content article for a better estimate
+		// Add some buffer for margins/padding
+		const contentHeight = previewEl.scrollHeight + 150; 
+		return Math.max(1, Math.ceil(contentHeight / A4_HEIGHT_PX));
 	});
 </script>
 
@@ -20,15 +22,14 @@
 	<header class="pane-header">
 		<span>Visualização em A4</span>
 		<div class="pane-stats">
-			<span>{wordCount} palavras</span>
-			<span class="separator">|</span>
-			<span>~{pageEstimate} {pageEstimate === 1 ? 'página' : 'páginas'}</span>
+			<span class="stat-pill">{wordCount} palavras</span>
+			<span class="stat-pill">~{pageEstimate} {pageEstimate === 1 ? 'página' : 'páginas'}</span>
 		</div>
 	</header>
 	<div class="paper-viewport">
-		<div id="legal-preview-container" bind:this={previewEl} class="page-container legal-paper {theme}">
+		<div id="legal-preview-container" class="page-container legal-paper {theme}">
 			{#if htmlContent}
-				<article class="petition-content">
+				<article bind:this={previewEl} class="petition-content">
 					{@html htmlContent}
 				</article>
 			{:else}

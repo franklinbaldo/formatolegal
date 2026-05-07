@@ -44,7 +44,14 @@
 	}
 </script>
 
-<div class="editor-pane {isHidden ? 'mobile-hidden' : ''}" ondragover={handleDragOver} ondragleave={handleDragLeave} ondrop={handleDrop}>
+<div 
+	class="editor-pane {isHidden ? 'mobile-hidden' : ''}" 
+	ondragover={handleDragOver} 
+	ondragleave={handleDragLeave} 
+	ondrop={handleDrop}
+	role="region"
+	aria-label="Editor de Markdown"
+>
 	<header class="pane-header">
 		<span>Markdown / Texto</span>
 		<select onchange={handleTemplateChange} aria-label="Modelos">
