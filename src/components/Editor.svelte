@@ -20,6 +20,7 @@
 	let previewEl: HTMLDivElement | undefined = $state();
 	let fileInputEl: HTMLInputElement | undefined = $state();
 	let printHtml = $state('');
+	let hydrated = $state(false);
 
 	const wordCount = $derived(markdown.trim() ? markdown.trim().split(/\s+/).length : 0);
 	const pageCount = $derived.by(() => {
@@ -40,6 +41,7 @@
 		if (savedTheme && isTheme(savedTheme)) theme = savedTheme;
 		const savedNumbered = localStorage.getItem(STORAGE_KEYS.numberedParagraphs);
 		if (savedNumbered === '1') numberedParagraphs = true;
+		hydrated = true;
 	});
 
 	$effect(() => {
@@ -74,6 +76,12 @@
 		};
 		window.addEventListener('keydown', handler);
 		return () => window.removeEventListener('keydown', handler);
+	});
+
+	$effect(() => {
+		const onPreloadError = (e: Event) => e.preventDefault();
+		window.addEventListener('vite:preloadError', onPreloadError);
+		return () => window.removeEventListener('vite:preloadError', onPreloadError);
 	});
 
 	function readFile(file: File): void {
@@ -133,7 +141,7 @@
 	}
 </script>
 
-<div class="editor-interface no-print pico">
+<div class="editor-interface no-print pico" data-hydrated={hydrated ? 'true' : undefined}>
 	<header class="toolbar">
 		<nav>
 			<ul>

@@ -16,6 +16,14 @@ Acesse: [https://franklinbaldo.github.io/formatolegal/](https://franklinbaldo.gi
   - **OAB Tradicional** — Times 12, h2 numerado automaticamente em algarismos romanos (I, II, III...), recuo 2cm.
   - **Contrato** — Times 11pt, single-spaced, listas ordenadas renderizadas como cláusulas hierárquicas (1.1, 1.2.3).
 - **Numerar parágrafos**: toggle independente que numera cada `<p>` automaticamente — útil para memoriais.
+- **Markdown estendido**:
+  - **Mermaid** — diagramas em blocos ` ```mermaid ` (fluxogramas, sequência, gantt) renderizados como SVG, inclusive na impressão.
+  - **Notas de rodapé** — sintaxe `texto[^1]` + `[^1]: definição` (marked-footnote).
+  - **Alertas GitHub** — `> [!NOTE] / [!TIP] / [!IMPORTANT] / [!WARNING] / [!CAUTION]` (marked-alert).
+  - **KaTeX** — fórmulas matemáticas com `$...$` ou `$$...$$`.
+  - **Realce de código** — blocos com linguagem usam highlight.js (tema GitHub).
+  - **Listas de tarefas** — `- [ ]` / `- [x]` estilizadas.
+  - **Emojis por shortcode** — `:balance_scale:` → ⚖️, `:gavel:` → 🔨, etc.
 - **Numeração de páginas em impressão**: rodapé "Pág. X de Y" via `@page` CSS (suportado em navegadores Chromium-based).
 - **Múltiplas formas de entrada**: copiar e colar, upload de arquivo `.md`/`.txt`/`.html` ou drag & drop diretamente no editor.
 - **Exportação**:
