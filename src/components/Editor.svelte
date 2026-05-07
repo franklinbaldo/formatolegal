@@ -17,7 +17,7 @@
 	let mobileTab = $state<'editor' | 'preview'>('editor');
 	let dragOver = $state(false);
 	let templateChoice = $state('');
-	let previewEl: HTMLDivElement | undefined = $state();
+	let previewEl: HTMLElement | undefined = $state();
 	let fileInputEl: HTMLInputElement | undefined = $state();
 	let printHtml = $state('');
 	let hydrated = $state(false);
@@ -141,98 +141,104 @@
 	}
 </script>
 
-<div class="editor-interface no-print pico" data-hydrated={hydrated ? 'true' : undefined}>
+<div class="editor-shell no-print pico" data-hydrated={hydrated ? 'true' : undefined}>
 	<header class="toolbar">
-		<div class="toolbar-row toolbar-brand">
-			<h1 class="brand">
-				<span class="brand-icon" aria-hidden="true">⚖️</span>
-				<span class="brand-text">Formato Legal</span>
-			</h1>
-			<div class="brand-controls">
-				<select id="theme-select" aria-label="Tema" bind:value={theme}>
-					{#each THEMES as t (t)}
-						<option value={t}>{THEME_LABELS[t]}</option>
-					{/each}
-				</select>
-				<label class="numbered-toggle">
+		<nav aria-label="Configurações do documento">
+			<ul>
+				<li>
+					<h1 class="brand" aria-label="Formato Legal">
+						<span aria-hidden="true">⚖️</span>
+						<span class="brand-text">Formato Legal</span>
+					</h1>
+				</li>
+			</ul>
+			<ul>
+				<li>
+					<select id="theme-select" aria-label="Tema" bind:value={theme}>
+						{#each THEMES as t (t)}
+							<option value={t}>{THEME_LABELS[t]}</option>
+						{/each}
+					</select>
+				</li>
+				<li>
+					<label for="numbered-paragraphs" class="numbered-toggle">
+						<input
+							id="numbered-paragraphs"
+							type="checkbox"
+							role="switch"
+							bind:checked={numberedParagraphs}
+						/>
+						Numerar §
+					</label>
+				</li>
+			</ul>
+		</nav>
+		<nav aria-label="Ações do documento">
+			<ul role="group" class="action-group">
+				<li>
 					<input
-						id="numbered-paragraphs"
-						type="checkbox"
-						role="switch"
-						bind:checked={numberedParagraphs}
+						type="file"
+						id="file-upload"
+						accept=".md,.txt,.html"
+						hidden
+						bind:this={fileInputEl}
+						onchange={onFileChange}
 					/>
-					<span>Numerar §</span>
-				</label>
-			</div>
-		</div>
-		<div class="toolbar-row toolbar-actions">
-			<input
-				type="file"
-				id="file-upload"
-				accept=".md,.txt,.html"
-				hidden
-				bind:this={fileInputEl}
-				onchange={onFileChange}
-			/>
-			<button
-				id="upload-btn"
-				class="secondary action-btn"
-				onclick={() => fileInputEl?.click()}
-				title="Subir arquivo"
-			>
-				<span class="action-icon" aria-hidden="true">📂</span>
-				<span class="action-label">Subir</span>
-			</button>
-			<button
-				id="download-html-btn"
-				class="secondary action-btn"
-				onclick={downloadHtml}
-				title="Baixar HTML"
-			>
-				<span class="action-icon" aria-hidden="true">⬇️</span>
-				<span class="action-label">HTML</span>
-			</button>
-			<button
-				id="clear-btn"
-				class="secondary outline action-btn"
-				onclick={clear}
-				title="Limpar conteúdo"
-			>
-				<span class="action-icon" aria-hidden="true">🗑️</span>
-				<span class="action-label">Limpar</span>
-			</button>
-			<button id="print-btn" class="action-btn primary-action" onclick={print} title="Imprimir PDF">
-				<span class="action-icon" aria-hidden="true">🖨️</span>
-				<span class="action-label">Imprimir PDF</span>
-			</button>
-		</div>
+					<button class="secondary" onclick={() => fileInputEl?.click()}>
+						<span aria-hidden="true">📂</span>
+						<span class="btn-label">Subir</span>
+					</button>
+				</li>
+				<li>
+					<button class="secondary" onclick={downloadHtml}>
+						<span aria-hidden="true">⬇️</span>
+						<span class="btn-label">Baixar HTML</span>
+					</button>
+				</li>
+				<li>
+					<button class="secondary outline" onclick={clear}>
+						<span aria-hidden="true">🗑️</span>
+						<span class="btn-label">Limpar</span>
+					</button>
+				</li>
+			</ul>
+			<ul>
+				<li>
+					<button onclick={print}>
+						<span aria-hidden="true">🖨️</span>
+						<span>Imprimir PDF</span>
+					</button>
+				</li>
+			</ul>
+		</nav>
 	</header>
 
-	<div class="mobile-tabs" role="tablist" aria-label="Painéis">
+	<div class="pane-tabs" role="tablist" aria-label="Painéis">
 		<button
-			id="tab-editor"
 			type="button"
 			role="tab"
+			aria-controls="editor-pane"
 			aria-selected={mobileTab === 'editor'}
-			class={mobileTab === 'editor' ? '' : 'outline'}
+			class:outline={mobileTab !== 'editor'}
 			onclick={() => (mobileTab = 'editor')}
 		>
 			Editor
 		</button>
 		<button
-			id="tab-preview"
 			type="button"
 			role="tab"
+			aria-controls="preview-pane"
 			aria-selected={mobileTab === 'preview'}
-			class={mobileTab === 'preview' ? '' : 'outline'}
+			class:outline={mobileTab !== 'preview'}
 			onclick={() => (mobileTab = 'preview')}
 		>
 			Visualização
 		</button>
 	</div>
 
-	<div class="main-split">
+	<main class="workspace">
 		<section
+			id="editor-pane"
 			class="editor-pane"
 			class:drag-over={dragOver}
 			class:mobile-hidden={mobileTab !== 'editor'}
@@ -241,30 +247,40 @@
 			ondragleave={() => (dragOver = false)}
 			ondrop={onDrop}
 		>
-			<header class="pane-header">
-				<small><strong>Markdown / Texto</strong></small>
+			<header>
+				<hgroup>
+					<small><strong>Markdown / Texto</strong></small>
+				</hgroup>
 				<select
 					id="template-select"
 					aria-label="Modelo"
 					bind:value={templateChoice}
 					onchange={onTemplateChange}
 				>
-					<option value="">Carregar Exemplo...</option>
+					<option value="">Carregar Exemplo…</option>
 					<option value="apelacao">Apelação Cível</option>
 					<option value="contestacao">Contestação</option>
 				</select>
 			</header>
 			<textarea
 				id="markdown-input"
-				placeholder="Cole seu Markdown aqui..."
+				placeholder="Cole seu Markdown aqui…"
 				bind:value={markdown}
+				aria-label="Markdown source"
 			></textarea>
 		</section>
 
-		<section class="preview-pane" class:mobile-hidden={mobileTab !== 'preview'}>
-			<header class="pane-header">
-				<small><strong>Visualização em A4</strong></small>
-				<small id="status-bar">{statusText}</small>
+		<section
+			id="preview-pane"
+			class="preview-pane"
+			class:mobile-hidden={mobileTab !== 'preview'}
+			aria-label="Visualização em A4"
+		>
+			<header>
+				<hgroup>
+					<small><strong>Visualização em A4</strong></small>
+				</hgroup>
+				<output id="status-bar" aria-live="polite"><small>{statusText}</small></output>
 			</header>
 			<div
 				id="legal-preview-container"
@@ -276,13 +292,13 @@
 					<!-- eslint-disable-next-line svelte/no-at-html-tags -- sanitized via DOMPurify in renderMarkdown -->
 					<article class="petition-content">{@html renderedHtml}</article>
 				{:else}
-					<div class="placeholder-msg">
-						<p>O resultado da formatação jurídica aparecerá aqui em tempo real.</p>
-					</div>
+					<p class="placeholder-msg">
+						O resultado da formatação jurídica aparecerá aqui em tempo real.
+					</p>
 				{/if}
 			</div>
 		</section>
-	</div>
+	</main>
 </div>
 
 <div class="page-container {theme}" class:numbered-paragraphs={numberedParagraphs}>
@@ -291,7 +307,7 @@
 </div>
 
 <style>
-	.editor-interface {
+	.editor-shell {
 		display: flex;
 		flex-direction: column;
 		height: 100dvh;
@@ -302,97 +318,90 @@
 		z-index: 1000;
 	}
 
-	.editor-interface > header.toolbar {
+	.toolbar {
 		display: flex;
 		flex-direction: column;
-		gap: 0.5rem;
-		padding: 0.625rem 1rem;
+		padding: 0.5rem 1rem;
+		gap: 0.25rem;
 		background: var(--pico-card-background-color);
 		border-bottom: 1px solid var(--pico-muted-border-color);
 	}
 
-	.toolbar-row {
-		display: flex;
-		align-items: center;
-		gap: 0.5rem;
+	.toolbar :global(nav) {
 		flex-wrap: wrap;
+		row-gap: 0.25rem;
 	}
 
-	.toolbar-brand {
-		justify-content: space-between;
+	.toolbar :global(nav ul) {
+		flex-wrap: wrap;
+		gap: 0.25rem 0.5rem;
+		margin: 0;
+		padding: 0;
 	}
 
-	.brand {
+	.toolbar :global(nav ul li) {
+		padding: 0.25rem 0;
+	}
+
+	.toolbar :global(select),
+	.toolbar :global(button) {
+		margin: 0;
+	}
+
+	.toolbar :global(button) {
 		display: inline-flex;
 		align-items: center;
 		gap: 0.4rem;
-		font-size: 1.05rem;
-		font-weight: 600;
-		margin: 0;
-		padding: 0;
-		color: var(--pico-primary);
+		padding: 0.4rem 0.75rem;
+		font-size: 0.875rem;
 		white-space: nowrap;
 	}
 
-	.brand-icon {
-		font-size: 1.2rem;
-		line-height: 1;
-	}
-
-	.brand-controls {
-		display: flex;
-		align-items: center;
-		gap: 0.5rem;
-		flex-wrap: wrap;
-	}
-
 	.toolbar :global(select#theme-select) {
-		margin: 0;
 		min-width: 9rem;
 		max-width: 14rem;
 		padding: 0.4rem 2rem 0.4rem 0.6rem;
 		font-size: 0.875rem;
 	}
 
-	.toolbar-actions {
-		gap: 0.4rem;
-	}
-
-	.action-btn {
+	.brand {
 		display: inline-flex;
 		align-items: center;
-		justify-content: center;
 		gap: 0.4rem;
 		margin: 0;
-		padding: 0.45rem 0.75rem;
+		padding: 0;
+		font-size: 1.05rem;
+		font-weight: 600;
+		line-height: 1.2;
+		color: var(--pico-primary);
+		white-space: nowrap;
+	}
+
+	.numbered-toggle {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.4rem;
+		margin: 0;
 		font-size: 0.875rem;
 		white-space: nowrap;
-		flex: 0 1 auto;
 	}
 
-	.action-btn .action-icon {
-		font-size: 1rem;
-		line-height: 1;
+	.numbered-toggle :global(input) {
+		margin: 0;
 	}
 
-	.primary-action {
-		margin-left: auto;
-	}
-
-	.mobile-tabs {
+	.pane-tabs {
 		display: none;
-		padding: 0;
-		gap: 0;
 		border-bottom: 1px solid var(--pico-muted-border-color);
 	}
 
-	.mobile-tabs button {
+	.pane-tabs :global(button) {
 		flex: 1;
 		margin: 0;
 		border-radius: 0;
 	}
 
-	.main-split {
+	.workspace {
 		display: flex;
 		flex: 1;
 		overflow: hidden;
@@ -422,7 +431,8 @@
 		margin: 2rem auto;
 	}
 
-	.pane-header {
+	.editor-pane > header,
+	.preview-pane > header {
 		display: flex;
 		justify-content: space-between;
 		align-items: center;
@@ -434,19 +444,17 @@
 		flex-wrap: wrap;
 	}
 
-	.pane-header :global(select) {
+	.editor-pane :global(hgroup),
+	.preview-pane :global(hgroup) {
+		margin: 0;
+	}
+
+	.editor-pane :global(select#template-select) {
 		width: auto;
-		max-width: 100%;
 		min-width: 9rem;
 		margin: 0;
 		padding: 0.35rem 1.75rem 0.35rem 0.55rem;
 		font-size: 0.8rem;
-	}
-
-	.pane-header small {
-		min-width: 0;
-		overflow: hidden;
-		text-overflow: ellipsis;
 	}
 
 	#markdown-input {
@@ -471,20 +479,6 @@
 		box-sizing: border-box;
 	}
 
-	.numbered-toggle {
-		display: inline-flex;
-		align-items: center;
-		gap: 0.4rem;
-		margin: 0;
-		font-size: 0.875rem;
-		color: var(--pico-color);
-		white-space: nowrap;
-	}
-
-	.numbered-toggle :global(input) {
-		margin: 0;
-	}
-
 	.placeholder-msg {
 		height: 100%;
 		display: flex;
@@ -493,6 +487,7 @@
 		color: var(--pico-muted-color);
 		font-style: italic;
 		text-align: center;
+		margin: 0;
 	}
 
 	:global(body > .page-container) {
@@ -500,10 +495,10 @@
 	}
 
 	@media (max-width: 900px) {
-		.mobile-tabs {
+		.pane-tabs {
 			display: flex;
 		}
-		.main-split {
+		.workspace {
 			flex-direction: column;
 		}
 		.editor-pane {
@@ -526,43 +521,21 @@
 	}
 
 	@media (max-width: 640px) {
-		.editor-interface > header.toolbar {
+		.toolbar {
 			padding: 0.5rem 0.625rem;
 		}
 		.brand-text {
 			display: none;
 		}
-		.brand {
-			font-size: 1rem;
-		}
 		.toolbar :global(select#theme-select) {
-			flex: 1 1 auto;
 			min-width: 0;
-		}
-		.numbered-toggle {
-			font-size: 0.8rem;
-		}
-		.action-btn {
 			flex: 1 1 auto;
-			padding: 0.5rem 0.5rem;
-			font-size: 0.8rem;
 		}
-		.action-btn .action-label {
+		.action-group :global(.btn-label) {
 			display: none;
 		}
-		.primary-action {
-			flex: 0 0 auto;
-			margin-left: auto;
-			padding: 0.5rem 0.85rem;
-		}
-		.primary-action .action-label {
-			display: inline;
-		}
-		.pane-header {
-			padding: 0.4rem 0.625rem;
-		}
-		.pane-header :global(select) {
-			flex: 1 1 auto;
+		.action-group :global(button) {
+			padding: 0.45rem 0.6rem;
 		}
 	}
 
