@@ -15,7 +15,7 @@ test('page loads with title and toolbar', async ({ page }) => {
 	await gotoReady(page);
 	await expect(page).toHaveTitle(/Formato Legal/);
 	await expect(page.getByRole('heading', { name: 'Formato Legal' })).toBeVisible();
-	await expect(page.getByRole('button', { name: 'Imprimir PDF' })).toBeVisible();
+	await expect(page.getByRole('button', { name: 'Salvar/Imprimir PDF' })).toBeVisible();
 });
 
 test('typing markdown renders headings in preview', async ({ page }) => {
@@ -30,7 +30,7 @@ test('clear button empties textarea after confirm', async ({ page }) => {
 	await gotoReady(page);
 	await page.locator('#markdown-input').fill('# Conteúdo');
 	page.on('dialog', (d) => d.accept());
-	await page.getByRole('button', { name: 'Limpar' }).click();
+	await page.getByRole('button', { name: 'Limpar tudo' }).click();
 	await expect(page.locator('#markdown-input')).toHaveValue('');
 });
 
@@ -136,7 +136,7 @@ test('downloaded HTML is visible (page-container not hidden by editor CSS)', asy
 	await page.locator('#markdown-input').fill('# Título\n\nConteúdo do documento.');
 
 	const downloadPromise = page.waitForEvent('download');
-	await page.getByRole('button', { name: 'Baixar HTML' }).click();
+	await page.getByRole('button', { name: 'Exportar HTML' }).click();
 	const download = await downloadPromise;
 	const stream = await download.createReadStream();
 	const chunks: Buffer[] = [];
