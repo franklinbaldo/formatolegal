@@ -1,0 +1,25 @@
+/* Default Premium Theme - Lora / Montserrat style */
+.theme-default {
+	font-family: 'Lora', serif;
+	font-size: 12pt;
+}
+
+.theme-default h1, .theme-default h2, .theme-default h3 {
+	font-family: 'Montserrat', sans-serif;
+	font-weight: 700;
+	color: #1a2a44;
+}
+
+.theme-default h2 {
+	border-bottom: 2px solid #e9ecef;
+	padding-bottom: 8px;
+}
+
+.theme-default p {
+	line-height: 1.8;
+}
+
+.theme-default blockquote {
+	font-family: 'Lora', serif;
+	border-left: 4px solid #1a2a44;
+}

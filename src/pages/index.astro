@@ -1,8 +1,33 @@
 ---
 import LegalLayout from '../layouts/LegalLayout.astro';
-import Editor from '../components/Editor.svelte';
+import LegalEditor from '../components/LegalEditor.svelte';
 ---
 
 <LegalLayout title="Formato Legal - Editor de Petições">
-	<Editor client:load />
+	<LegalEditor client:load />
+
+	<!-- Print container - only visible during print -->
+	<div class="page-container theme-default">
+		<article id="print-article"></article>
+	</div>
 </LegalLayout>
+
+<style is:global>
+	/* Hide the default slot-based page-container from layout when in editor mode */
+	.page-container {
+		display: none;
+	}
+
+	@media print {
+		.no-print {
+			display: none !important;
+		}
+		.page-container {
+			display: block !important;
+		}
+		body {
+			background: white !important;
+			padding: 0 !important;
+		}
+	}
+</style>
