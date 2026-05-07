@@ -6,7 +6,8 @@
 	--margin-bottom: 25mm;
 	--margin-left: 30mm;
 	--margin-right: 20mm;
-	--primary-color: #1a2a44;
+	--brand: #1a2a44;
+	--primary-color: var(--brand);
 	--paper-bg: white;
 	--paper-color: #333;
 }
