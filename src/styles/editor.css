@@ -302,24 +302,124 @@
 	flex: 0 0 80px !important;
 }
 
+/* Hamburger toggle: hidden on desktop */
+.mobile-only { display: none; }
+.hamburger-wrap { position: relative; }
+
+.hamburger-btn {
+	background: rgba(255, 255, 255, 0.08);
+	border: 1px solid rgba(255, 255, 255, 0.18);
+	color: white;
+	width: 40px;
+	height: 40px;
+	padding: 0 !important;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	border-radius: 8px;
+	cursor: pointer;
+	transition: background 0.2s ease;
+}
+.hamburger-btn:hover { background: rgba(255, 255, 255, 0.15); }
+.hamburger-btn:focus-visible { outline: 2px solid #ffc107; outline-offset: 2px; }
+
+.hamburger-icon {
+	display: inline-block;
+	position: relative;
+	width: 20px;
+	height: 14px;
+}
+.hamburger-icon span {
+	position: absolute;
+	left: 0;
+	width: 100%;
+	height: 2px;
+	background: white;
+	border-radius: 2px;
+	transition: transform 0.25s ease, opacity 0.2s ease, top 0.25s ease;
+}
+.hamburger-icon span:nth-child(1) { top: 0; }
+.hamburger-icon span:nth-child(2) { top: 6px; }
+.hamburger-icon span:nth-child(3) { top: 12px; }
+.hamburger-icon.open span:nth-child(1) { top: 6px; transform: rotate(45deg); }
+.hamburger-icon.open span:nth-child(2) { opacity: 0; }
+.hamburger-icon.open span:nth-child(3) { top: 6px; transform: rotate(-45deg); }
+
+.toolbar-menu {
+	position: absolute;
+	top: calc(100% + 8px);
+	right: 0;
+	min-width: 240px;
+	background: white;
+	color: #1a2a44;
+	border-radius: 10px;
+	box-shadow: 0 12px 40px rgba(0, 0, 0, 0.25);
+	padding: 6px;
+	display: flex;
+	flex-direction: column;
+	gap: 2px;
+	z-index: 1200;
+	animation: menuFadeIn 0.15s ease-out;
+}
+@keyframes menuFadeIn {
+	from { opacity: 0; transform: translateY(-6px); }
+	to { opacity: 1; transform: translateY(0); }
+}
+.toolbar-menu button {
+	all: unset;
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	padding: 10px 12px;
+	border-radius: 6px;
+	font-size: 0.92rem;
+	font-weight: 500;
+	cursor: pointer;
+	color: #1a2a44;
+	transition: background 0.15s ease;
+}
+.toolbar-menu button:hover,
+.toolbar-menu button:focus-visible {
+	background: #f0f4ff;
+	outline: none;
+}
+.toolbar-menu button.danger { color: #c92a2a; }
+.toolbar-menu button.danger:hover { background: #fff5f5; }
+.toolbar-menu .mi-icon { font-size: 1.05rem; width: 1.25em; text-align: center; }
+.toolbar-menu hr {
+	border: none;
+	border-top: 1px solid #eef0f2;
+	margin: 4px 2px;
+	page-break-before: auto;
+}
+.toolbar-menu hr::after { content: none; }
+
+.toolbar .primary-action { font-weight: 600; }
+
 /* Responsive */
 @media (max-width: 900px) {
 	.toolbar {
 		padding: 0.5rem 0.75rem !important;
 	}
-	.toolbar ul:last-child {
+	.toolbar ul {
+		gap: 6px;
+	}
+	.toolbar-actions {
+		gap: 6px;
+	}
+	.desktop-only { display: none !important; }
+	.mobile-only { display: inline-flex; }
+	.toolbar strong { display: none; }
+	.privacy-badge { display: none; }
+	.theme-select-wrap { flex: 1; min-width: 0; }
+	.toolbar select#theme-select {
 		width: 100%;
-		display: flex;
-		flex-wrap: wrap;
-		justify-content: center;
-		gap: 8px;
+		max-width: 200px;
 	}
-	.toolbar select, .toolbar button {
-		flex: 1 1 calc(50% - 8px);
-		min-width: 120px;
-	}
-	.toolbar strong {
-		display: none;
+	.toolbar .primary-action {
+		padding: 0.5rem 0.75rem;
+		font-size: 0.82rem;
+		white-space: nowrap;
 	}
 	.paper-viewport {
 		padding: 15px;
@@ -329,6 +429,12 @@
 		min-height: auto;
 		padding: 20mm 15mm;
 	}
+}
+
+@media (max-width: 480px) {
+	.toolbar .icon { font-size: 1.25rem; }
+	.toolbar .primary-action { padding: 0.45rem 0.6rem; font-size: 0.78rem; }
+	.toolbar select#theme-select { font-size: 0.78rem; }
 }
 
 /* Print Handling Mirror (hidden in app, shown in print) */
