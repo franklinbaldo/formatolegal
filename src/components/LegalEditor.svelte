@@ -2,7 +2,7 @@
 	import { onMount } from 'svelte';
 	import { renderMarkdown } from '../scripts/render';
 	import { STORAGE_KEYS, type Theme, isTheme, safeLocalStorage } from '../scripts/themes';
-	import { buildStandaloneHtml, downloadBlob } from '../scripts/download';
+	import { buildStandaloneHtml, downloadBlob, copyHtmlToClipboard } from '../scripts/download';
 	import Toolbar from './Toolbar.svelte';
 	import EditorPane from './EditorPane.svelte';
 	import PreviewPane from './PreviewPane.svelte';
@@ -13,6 +13,7 @@
 	let htmlContent = $state('');
 	let mobileTab = $state<'editor' | 'preview'>('editor');
 	let mounted = $state(false);
+	let copyLabel = $state('Copiar HTML');
 
 	// Keyboard shortcuts
 	$effect(() => {
@@ -88,6 +89,13 @@
 		}
 	}
 
+	async function handleCopyHtml() {
+		if (!htmlContent) return;
+		await copyHtmlToClipboard(htmlContent);
+		copyLabel = '✓ Copiado!';
+		setTimeout(() => (copyLabel = 'Copiar HTML'), 2000);
+	}
+
 	function handleUpload(text: string) {
 		content = text;
 	}
@@ -97,12 +105,14 @@
 	}
 </script>
 
-<div class="editor-interface no-print">
-	<Toolbar 
-		bind:theme={theme} 
-		onPrint={handlePrint} 
+<div class="editor-interface no-print" data-hydrated={mounted}>
+	<Toolbar
+		bind:theme={theme}
+		onPrint={handlePrint}
 		onDownload={handleDownload}
-		onClear={handleClear} 
+		onCopyHtml={handleCopyHtml}
+		{copyLabel}
+		onClear={handleClear}
 		onUpload={handleUpload}
 	/>
 	

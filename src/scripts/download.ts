@@ -1,3 +1,8 @@
+export async function copyHtmlToClipboard(articleHtml: string): Promise<void> {
+	const blob = new Blob([articleHtml], { type: 'text/html' });
+	await navigator.clipboard.write([new ClipboardItem({ 'text/html': blob })]);
+}
+
 export function downloadBlob(filename: string, blob: Blob): void {
 	const url = URL.createObjectURL(blob);
 	const a = document.createElement('a');

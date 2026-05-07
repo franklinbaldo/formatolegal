@@ -15,18 +15,33 @@ export const THEMES = [
 export type Theme = (typeof THEMES)[number];
 
 export const THEME_LABELS: Record<Theme, string> = {
-	'theme-default': 'Padrão (Lora/Mont)',
-	'theme-classic': 'Clássico (Times)',
-	'theme-abnt': 'ABNT (Times 12, 1,5)',
+	'theme-default': 'Padrão Jurídico',
+	'theme-classic': 'Clássico Editorial',
+	'theme-abnt': 'ABNT (Times 12, 1.5)',
 	'theme-cnj': 'CNJ / STF-STJ (Arial 12)',
-	'theme-oab': 'OAB Tradicional (numerais)',
-	'theme-contrato': 'Contrato (Times 11, cláusulas)',
+	'theme-oab': 'OAB Tradicional',
+	'theme-contrato': 'Contrato',
 	'theme-cyberpunk': '🌃 Cyberpunk Noturno',
 	'theme-vintage': '📜 Manuscrito Vintage',
 	'theme-pastel': '🌸 Pastel Sereno',
 	'theme-brutalist': '⬛ Brutalista',
 	'theme-festa': '🎉 Petição Festa',
 };
+
+export const THEME_GROUPS: { label: string; themes: Theme[] }[] = [
+	{
+		label: '⚖️ Protocolo seguro',
+		themes: ['theme-default', 'theme-abnt', 'theme-cnj', 'theme-oab', 'theme-contrato'],
+	},
+	{
+		label: '✍️ Petição com alma',
+		themes: ['theme-classic', 'theme-vintage', 'theme-pastel'],
+	},
+	{
+		label: '🚨 Tipografia absolutamente ilegal',
+		themes: ['theme-cyberpunk', 'theme-brutalist', 'theme-festa'],
+	},
+];
 
 export const STORAGE_KEYS = {
 	content: 'formatolegal_content',
