@@ -79,7 +79,12 @@
 			<button class="icon-btn secondary outline" title="Exportar HTML" aria-label="Exportar HTML" onclick={onDownload}>💾</button>
 		</li>
 		<li class="desktop-only">
-			<button class="icon-btn secondary outline" title={justCopied ? copyLabel : 'Copiar HTML'} aria-label="Copiar HTML" onclick={onCopyHtml}>
+			<button
+				class="icon-btn secondary outline"
+				title={justCopied ? copyLabel : 'Copiar HTML'}
+				aria-label={justCopied ? copyLabel : 'Copiar HTML'}
+				onclick={onCopyHtml}
+			>
 				{justCopied ? '✓' : '📋'}
 			</button>
 		</li>
@@ -107,4 +112,7 @@
 			</details>
 		</li>
 	</ul>
+	<span class="sr-only" aria-live="polite" aria-atomic="true">
+		{justCopied ? copyLabel : ''}
+	</span>
 </nav>
