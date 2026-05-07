@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import { renderMarkdown } from '../scripts/render';
-	import { STORAGE_KEYS, type Theme, isTheme } from '../scripts/themes';
+	import { STORAGE_KEYS, type Theme, isTheme, safeLocalStorage } from '../scripts/themes';
 	import { buildStandaloneHtml, downloadBlob } from '../scripts/download';
 	import Toolbar from './Toolbar.svelte';
 	import EditorPane from './EditorPane.svelte';
@@ -13,6 +13,18 @@
 	let htmlContent = $state('');
 	let mobileTab = $state<'editor' | 'preview'>('editor');
 	let mounted = $state(false);
+
+	// Keyboard shortcuts
+	$effect(() => {
+		const handleKeyDown = (e: KeyboardEvent) => {
+			if ((e.ctrlKey || e.metaKey) && e.key === 's') {
+				e.preventDefault();
+				handleDownload();
+			}
+		};
+		window.addEventListener('keydown', handleKeyDown);
+		return () => window.removeEventListener('keydown', handleKeyDown);
+	});
 
 	// Derived values (Sync rendering)
 	$effect(() => {
@@ -27,21 +39,21 @@
 		
 		// Auto-save (only after mount to avoid clearing storage with initial empty string)
 		if (mounted) {
-			localStorage.setItem(STORAGE_KEYS.content, content);
+			safeLocalStorage.set(STORAGE_KEYS.content, content);
 		}
 	});
 
 	$effect(() => {
 		if (mounted) {
-			localStorage.setItem(STORAGE_KEYS.theme, theme);
+			safeLocalStorage.set(STORAGE_KEYS.theme, theme);
 		}
 	});
 
 	onMount(() => {
-		const savedContent = localStorage.getItem(STORAGE_KEYS.content);
+		const savedContent = safeLocalStorage.get(STORAGE_KEYS.content);
 		if (savedContent) content = savedContent;
 
-		const savedTheme = localStorage.getItem(STORAGE_KEYS.theme);
+		const savedTheme = safeLocalStorage.get(STORAGE_KEYS.theme);
 		if (savedTheme && isTheme(savedTheme)) theme = savedTheme;
 		
 		mounted = true;

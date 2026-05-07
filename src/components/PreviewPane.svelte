@@ -1,13 +1,19 @@
 <script lang="ts">
 	let { htmlContent, theme, isHidden = false } = $props();
+	let previewEl = $state<HTMLElement | null>(null);
 
 	// Calculate stats
 	const wordCount = $derived(
 		htmlContent ? htmlContent.replace(/<[^>]*>/g, ' ').split(/\s+/).filter(w => w.length > 0).length : 0
 	);
 	
-	// Rough A4 estimate: ~500 words per page depending on theme
-	const pageEstimate = $derived(Math.max(1, Math.ceil(wordCount / 450)));
+	// A4 height is roughly 1123px at 96dpi
+	const A4_HEIGHT_PX = 1123;
+	const pageEstimate = $derived.by(() => {
+		if (!previewEl) return 1;
+		// Use scrollHeight for a better physical estimate
+		return Math.max(1, Math.ceil(previewEl.scrollHeight / A4_HEIGHT_PX));
+	});
 </script>
 
 <div class="preview-pane {isHidden ? 'mobile-hidden' : ''}">
@@ -20,7 +26,7 @@
 		</div>
 	</header>
 	<div class="paper-viewport">
-		<div id="legal-preview-container" class="page-container legal-paper {theme}">
+		<div id="legal-preview-container" bind:this={previewEl} class="page-container legal-paper {theme}">
 			{#if htmlContent}
 				<article class="petition-content">
 					{@html htmlContent}
