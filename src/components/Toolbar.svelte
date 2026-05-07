@@ -24,7 +24,7 @@
 	<ul>
 		<li>
 			<span class="icon">⚖️</span>
-			<strong>Formato Legal</strong>
+			<strong role="heading" aria-level="1">Formato Legal</strong>
 		</li>
 		<li class="privacy-badge">
 			<span title="Sua minuta não é enviada a servidores. Tudo roda no seu navegador.">🔒 Processamento local</span>
