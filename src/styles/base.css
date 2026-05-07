@@ -114,21 +114,3 @@ hr::after {
 	padding: 0 10px;
 }
 
-/* === Numeração de parágrafos (toggle independente de tema) === */
-.numbered-paragraphs article {
-	counter-reset: para;
-}
-.numbered-paragraphs article > p {
-	counter-increment: para;
-	position: relative;
-	padding-left: 2.5em;
-	text-indent: 0;
-}
-.numbered-paragraphs article > p::before {
-	content: counter(para) '.';
-	position: absolute;
-	left: 0;
-	font-weight: 700;
-	width: 2em;
-	text-align: right;
-}
