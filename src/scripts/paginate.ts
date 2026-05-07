@@ -1,9 +1,10 @@
 // Page layout for the live preview. The paginator walks the rendered article
 // once for layout, then drives every text-related measurement through pretext:
-// paragraph and list-item heights, paragraph splits, and remainder line counts
-// are all computed by `prepareWithSegments` + `layoutNextLineRange` against
-// the page's actual content width. DOM measurement is reserved for blocks
-// that aren't plain text (KaTeX, mermaid, code, tables, images).
+// paragraph, heading, list-item and code-block heights, paragraph splits,
+// and remainder line counts are all computed by `prepareWithSegments` +
+// `layoutNextLineRange` against the page's actual content width. DOM
+// measurement is reserved for blocks whose layout doesn't reduce to font
+// metrics (mermaid SVG diagrams, tables, images/figures).
 
 import {
 	prepareWithSegments,
@@ -158,16 +159,24 @@ function measurePreBlock(pre: HTMLElement): { contentHeight: number } | null {
 	const inner = pre.querySelector('code') ?? pre;
 	const text = inner.textContent ?? '';
 	const lines = Math.max(1, text.split('\n').length - (text.endsWith('\n') ? 1 : 0));
-	const cs = getComputedStyle(inner);
-	const lineHeight = pxOr(cs.lineHeight, pxOr(cs.fontSize, 14) * 1.4);
+	const innerCS = getComputedStyle(inner);
+	const lineHeight = pxOr(innerCS.lineHeight, pxOr(innerCS.fontSize, 14) * 1.4);
 	const preCS = getComputedStyle(pre);
-	const padTop = pxOr(preCS.paddingTop, 0);
-	const padBottom = pxOr(preCS.paddingBottom, 0);
-	const borderTop = pxOr(preCS.borderTopWidth, 0);
-	const borderBottom = pxOr(preCS.borderBottomWidth, 0);
-	return {
-		contentHeight: lines * lineHeight + padTop + padBottom + borderTop + borderBottom,
-	};
+	// Highlight.js places its padding on `pre code.hljs`, not on `<pre>` itself
+	// (see plugins.css). Sum chrome from both elements so the height isn't
+	// undercounted for highlighted code blocks.
+	const chrome =
+		pxOr(preCS.paddingTop, 0) +
+		pxOr(preCS.paddingBottom, 0) +
+		pxOr(preCS.borderTopWidth, 0) +
+		pxOr(preCS.borderBottomWidth, 0) +
+		(inner === pre
+			? 0
+			: pxOr(innerCS.paddingTop, 0) +
+				pxOr(innerCS.paddingBottom, 0) +
+				pxOr(innerCS.borderTopWidth, 0) +
+				pxOr(innerCS.borderBottomWidth, 0));
+	return { contentHeight: lines * lineHeight + chrome };
 }
 
 // ---------------------------------------------------------------------------
@@ -324,12 +333,20 @@ function childCumulativeBottoms(
 		// Use the first item's actual offset from the container top to pick up
 		// the list's top padding/border, then accumulate measured li heights.
 		const containerCS = getComputedStyle(el);
+		const padLeft = pxOr(containerCS.paddingLeft, 0);
+		const padRight = pxOr(containerCS.paddingRight, 0);
+		const borderLeft = pxOr(containerCS.borderLeftWidth, 0);
+		const borderRight = pxOr(containerCS.borderRightWidth, 0);
 		const padTop = pxOr(containerCS.paddingTop, 0);
 		const borderTop = pxOr(containerCS.borderTopWidth, 0);
+		// list-item text is rendered inside the list's content box, narrower
+		// than the page by the list's horizontal padding/border (e.g. the 3em
+		// padding-left from base.css).
+		const liWidth = Math.max(40, contentWidth - padLeft - padRight - borderLeft - borderRight);
 		let y = padTop + borderTop;
 		const out: number[] = [];
 		for (const li of children) {
-			const measured = measureTextBlock(li, contentWidth);
+			const measured = measureTextBlock(li, liWidth);
 			let liHeight: number;
 			if (measured) {
 				const liStyle = readTextStyle(li);
