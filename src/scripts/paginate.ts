@@ -115,13 +115,21 @@ function readTextStyle(el: HTMLElement): TextStyle {
 	};
 }
 
-// Count how many lines the given pretext-prepared text takes at `width`.
+// Count how many lines the given pretext-prepared text takes. The first line
+// can be laid out at a narrower width (CSS text-indent or marker offset);
+// subsequent lines use `width`.
 function countLines(
 	prepared: ReturnType<typeof prepareWithSegments>,
 	width: number,
+	firstLineWidth?: number,
 ): number {
 	let lines = 0;
 	let cursor: LayoutCursor = { segmentIndex: 0, graphemeIndex: 0 };
+	const fw = Math.max(40, firstLineWidth ?? width);
+	const first = layoutNextLineRange(prepared, cursor, fw);
+	if (!first) return 0;
+	cursor = first.end;
+	lines = 1;
 	while (true) {
 		const next = layoutNextLineRange(prepared, cursor, width);
 		if (!next) break;
@@ -147,7 +155,12 @@ function measureTextBlock(
 	if (!text.trim()) return null;
 	const style = readTextStyle(el);
 	const prepared = prepareWithSegments(text, style.fontStr, PRE_WRAP_OPTS);
-	const lines = countLines(prepared, contentWidth);
+	// CSS `text-indent` shrinks the first line's usable width (paragraphs in
+	// base.css use `text-indent: 2em`). Continuation slices override it to 0.
+	const cs = getComputedStyle(el);
+	const indent = Math.max(0, pxOr(cs.textIndent, 0));
+	const firstLineWidth = indent > 0 ? Math.max(40, contentWidth - indent) : contentWidth;
+	const lines = countLines(prepared, contentWidth, firstLineWidth);
 	return { contentHeight: lines * style.lineHeight, lineHeight: style.lineHeight };
 }
 
@@ -234,10 +247,13 @@ function splitParagraph(
 	if (!fullText.trim()) return null;
 
 	const prepared = prepareWithSegments(fullText, style.fontStr, PRE_WRAP_OPTS);
+	const indent = Math.max(0, pxOr(getComputedStyle(p).textIndent, 0));
+	const firstLineWidth = indent > 0 ? Math.max(40, contentWidth - indent) : contentWidth;
 	let cursor: LayoutCursor = { segmentIndex: 0, graphemeIndex: 0 };
 	let lastEnd: LayoutCursor | null = null;
 	for (let i = 0; i < linesThatFit; i++) {
-		const next = layoutNextLineRange(prepared, cursor, contentWidth);
+		const w = i === 0 ? firstLineWidth : contentWidth;
+		const next = layoutNextLineRange(prepared, cursor, w);
 		if (!next) return null; // fits without split
 		lastEnd = next.end;
 		cursor = next.end;
@@ -346,7 +362,14 @@ function childCumulativeBottoms(
 		let y = padTop + borderTop;
 		const out: number[] = [];
 		for (const li of children) {
-			const measured = measureTextBlock(li, liWidth);
+			// Fall back to DOM measurement when the item has an inline marker
+			// pretext can't see: GFM task-list checkboxes, or theme-driven
+			// `::before` content (e.g. custom numbering in contrato.css).
+			const before = getComputedStyle(li, '::before').content;
+			const hasPseudoMarker = before && before !== 'none' && before !== 'normal' && before !== '""';
+			const hasInlineMarker = !!li.querySelector('input[type=checkbox]');
+			const measured =
+				hasInlineMarker || hasPseudoMarker ? null : measureTextBlock(li, liWidth);
 			let liHeight: number;
 			if (measured) {
 				const liStyle = readTextStyle(li);
