@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import { renderMarkdown } from '../scripts/render';
-	import { STORAGE_KEYS, type Theme } from '../scripts/themes';
+	import { STORAGE_KEYS, type Theme, isTheme } from '../scripts/themes';
 	import { buildStandaloneHtml, downloadBlob } from '../scripts/download';
 	import Toolbar from './Toolbar.svelte';
 	import EditorPane from './EditorPane.svelte';
@@ -41,13 +41,16 @@
 		const savedContent = localStorage.getItem(STORAGE_KEYS.content);
 		if (savedContent) content = savedContent;
 
-		const savedTheme = localStorage.getItem(STORAGE_KEYS.theme) as Theme;
-		if (savedTheme) theme = savedTheme;
+		const savedTheme = localStorage.getItem(STORAGE_KEYS.theme);
+		if (savedTheme && isTheme(savedTheme)) theme = savedTheme;
 		
 		mounted = true;
 	});
 
-	function handlePrint() {
+	async function handlePrint() {
+		// Ensure htmlContent is fresh
+		htmlContent = await renderMarkdown(content);
+
 		// Update the print-article in the DOM (used by LegalLayout/CSS)
 		const printArticle = document.getElementById('print-article');
 		if (printArticle) {

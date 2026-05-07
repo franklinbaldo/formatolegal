@@ -2,13 +2,15 @@
 	import { THEME_LABELS, THEMES } from '../scripts/themes';
 	let { theme = $bindable(), onPrint, onDownload, onClear, onUpload } = $props();
 
-	function handleFileChange(e: any) {
+	function handleFileChange(e: Event & { target: HTMLInputElement & { files: FileList } }) {
 		const file = e.target.files[0];
 		if (!file) return;
 		
 		const reader = new FileReader();
-		reader.onload = (e: any) => {
-			onUpload(e.target.result);
+		reader.onload = (e: ProgressEvent<FileReader>) => {
+			if (typeof e.target?.result === 'string') {
+				onUpload(e.target.result);
+			}
 		};
 		reader.readAsText(file);
 	}

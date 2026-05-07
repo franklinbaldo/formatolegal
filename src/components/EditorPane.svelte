@@ -9,7 +9,7 @@
 		contestacao: contestacaoTemplate,
 	};
 
-	function handleTemplateChange(e: any) {
+	function handleTemplateChange(e: Event & { target: HTMLSelectElement }) {
 		const val = e.target.value;
 		if (val && templates[val]) {
 			onTemplate(templates[val]);
@@ -34,8 +34,10 @@
 		const file = e.dataTransfer?.files[0];
 		if (file) {
 			const reader = new FileReader();
-			reader.onload = (e: any) => {
-				content = e.target.result;
+			reader.onload = (e: ProgressEvent<FileReader>) => {
+				if (typeof e.target?.result === 'string') {
+					content = e.target.result;
+				}
 			};
 			reader.readAsText(file);
 		}
