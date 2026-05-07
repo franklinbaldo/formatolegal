@@ -42,23 +42,26 @@
 	<div class="paper-viewport">
 		{#if pages.length > 0}
 			{#each pages as pageHtml, i (i)}
-				<div
-					id={i === 0 ? 'legal-preview-container' : undefined}
-					class="page-container legal-paper {theme}"
-					data-page-number={i + 1}
-				>
-					<article class="petition-content">
-						<!-- eslint-disable-next-line svelte/no-at-html-tags -->
-						{@html pageHtml}
-					</article>
+				<div class="page-frame" data-page-number={i + 1}>
+					<div
+						id={i === 0 ? 'legal-preview-container' : undefined}
+						class="page-container legal-paper {theme}"
+					>
+						<article class="petition-content">
+							<!-- eslint-disable-next-line svelte/no-at-html-tags -->
+							{@html pageHtml}
+						</article>
+					</div>
 				</div>
 			{/each}
 		{:else}
-			<div id="legal-preview-container" class="page-container legal-paper {theme}">
-				<div class="placeholder-msg">
-					<p class="placeholder-title">Sua peça ainda está em branco.</p>
-					<p class="placeholder-sub">Cole uma minuta, escolha um padrão e veja a mágica jurídica acontecer.</p>
-					<p class="placeholder-hint">Para protocolo → <strong>CNJ/STF-STJ</strong><br>Para caos controlado → <strong>Petição Festa</strong></p>
+			<div class="page-frame">
+				<div id="legal-preview-container" class="page-container legal-paper {theme}">
+					<div class="placeholder-msg">
+						<p class="placeholder-title">Sua peça ainda está em branco.</p>
+						<p class="placeholder-sub">Cole uma minuta, escolha um padrão e veja a mágica jurídica acontecer.</p>
+						<p class="placeholder-hint">Para protocolo → <strong>CNJ/STF-STJ</strong><br>Para caos controlado → <strong>Petição Festa</strong></p>
+					</div>
 				</div>
 			</div>
 		{/if}
