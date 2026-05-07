@@ -45,6 +45,9 @@ export async function buildStandaloneHtml(
 	articleHtml: string,
 ): Promise<string> {
 	const styles = await collectAllStyles();
+	// Nest .page-container inside <main> so editor CSS rules that target
+	// `body > .page-container` (used in-app to hide the print mirror) do not
+	// match in the exported document and hide its entire body.
 	return `<!DOCTYPE html>
 <html lang="pt-br">
 <head>
@@ -54,9 +57,11 @@ export async function buildStandaloneHtml(
 <style>${styles}</style>
 </head>
 <body>
+<main>
 <div class="page-container ${themeClass}">
 <article class="petition-content">${articleHtml}</article>
 </div>
+</main>
 </body>
 </html>`;
 }
