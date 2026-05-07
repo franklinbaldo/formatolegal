@@ -146,11 +146,22 @@ function countLines(
 // - <img>/<svg> are intrinsically sized boxes.
 // Code blocks ARE text (monospace, no wrap) and are handled separately by
 // `measurePreBlock` below.
+// True when an element has ::before or ::after content that pretext can't see
+// (themes like festa.css inject heading prefixes/suffixes via pseudo-elements).
+function hasGeneratedContent(el: HTMLElement): boolean {
+	for (const pseudo of ['::before', '::after']) {
+		const c = getComputedStyle(el, pseudo).content;
+		if (c && c !== 'none' && c !== 'normal' && c !== '""') return true;
+	}
+	return false;
+}
+
 function measureTextBlock(
 	el: HTMLElement,
 	contentWidth: number,
 ): { contentHeight: number; lineHeight: number } | null {
 	if (el.querySelector('img,.mermaid-diagram,svg')) return null;
+	if (hasGeneratedContent(el)) return null;
 	const text = buildPretextInput(el);
 	if (!text.trim()) return null;
 	const style = readTextStyle(el);
@@ -161,7 +172,18 @@ function measureTextBlock(
 	const indent = Math.max(0, pxOr(cs.textIndent, 0));
 	const firstLineWidth = indent > 0 ? Math.max(40, contentWidth - indent) : contentWidth;
 	const lines = countLines(prepared, contentWidth, firstLineWidth);
-	return { contentHeight: lines * style.lineHeight, lineHeight: style.lineHeight };
+	// Include the block's own vertical chrome (padding + border). Headings in
+	// pastel/festa/brutalist themes use padding/border for emphasis; without
+	// this they'd be measured shorter than they actually render.
+	const chrome =
+		pxOr(cs.paddingTop, 0) +
+		pxOr(cs.paddingBottom, 0) +
+		pxOr(cs.borderTopWidth, 0) +
+		pxOr(cs.borderBottomWidth, 0);
+	return {
+		contentHeight: lines * style.lineHeight + chrome,
+		lineHeight: style.lineHeight,
+	};
 }
 
 // `<pre>` is monospace text that the browser renders with `white-space: pre`
