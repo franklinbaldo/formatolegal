@@ -1,4 +1,5 @@
 export async function copyHtmlToClipboard(articleHtml: string): Promise<void> {
+	if (!navigator.clipboard) return;
 	if (typeof ClipboardItem !== 'undefined' && navigator.clipboard.write) {
 		const blob = new Blob([articleHtml], { type: 'text/html' });
 		await navigator.clipboard.write([new ClipboardItem({ 'text/html': blob })]);
