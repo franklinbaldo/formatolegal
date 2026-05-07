@@ -4,7 +4,7 @@
 
 	// Calculate stats
 	const wordCount = $derived(
-		htmlContent ? htmlContent.replace(/<[^>]*>/g, ' ').split(/\s+/).filter(w => w.length > 0).length : 0
+		htmlContent ? htmlContent.replace(/<[^>]*>/g, ' ').split(/\s+/).filter((w: string) => w.length > 0).length : 0
 	);
 	
 	// A4 height is roughly 1123px at 96dpi
@@ -30,6 +30,7 @@
 		<div id="legal-preview-container" class="page-container legal-paper {theme}">
 			{#if htmlContent}
 				<article bind:this={previewEl} class="petition-content">
+					<!-- eslint-disable-next-line svelte/no-at-html-tags -->
 					{@html htmlContent}
 				</article>
 			{:else}

@@ -9,8 +9,9 @@
 		contestacao: contestacaoTemplate,
 	};
 
-	function handleTemplateChange(e: Event & { target: HTMLSelectElement }) {
-		const val = e.target.value;
+	function handleTemplateChange(e: Event) {
+		const target = e.currentTarget as HTMLSelectElement;
+		const val = target.value;
 		if (val && templates[val]) {
 			onTemplate(templates[val]);
 		}
@@ -34,6 +35,7 @@
 		const file = e.dataTransfer?.files[0];
 		if (file) {
 			const reader = new FileReader();
+			// eslint-disable-next-line no-undef
 			reader.onload = (e: ProgressEvent<FileReader>) => {
 				if (typeof e.target?.result === 'string') {
 					content = e.target.result;

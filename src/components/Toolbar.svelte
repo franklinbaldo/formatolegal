@@ -2,11 +2,13 @@
 	import { THEME_LABELS, THEMES } from '../scripts/themes';
 	let { theme = $bindable(), onPrint, onDownload, onClear, onUpload } = $props();
 
-	function handleFileChange(e: Event & { target: HTMLInputElement & { files: FileList } }) {
-		const file = e.target.files[0];
+	function handleFileChange(e: Event) {
+		const target = e.currentTarget as HTMLInputElement;
+		const file = target.files?.[0];
 		if (!file) return;
 		
 		const reader = new FileReader();
+		// eslint-disable-next-line no-undef
 		reader.onload = (e: ProgressEvent<FileReader>) => {
 			if (typeof e.target?.result === 'string') {
 				onUpload(e.target.result);
@@ -28,7 +30,7 @@
 	<ul>
 		<li>
 			<select bind:value={theme} aria-label="Selecione o estilo">
-				{#each THEMES as t}
+				{#each THEMES as t (t)}
 					<option value={t}>{THEME_LABELS[t]}</option>
 				{/each}
 			</select>
