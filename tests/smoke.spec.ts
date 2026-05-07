@@ -70,6 +70,20 @@ test('all BR-legal themes are selectable', async ({ page }) => {
 	}
 });
 
+test('all fun themes are selectable', async ({ page }) => {
+	await gotoReady(page);
+	for (const theme of [
+		'theme-cyberpunk',
+		'theme-vintage',
+		'theme-pastel',
+		'theme-brutalist',
+		'theme-festa',
+	]) {
+		await page.locator('#theme-select').selectOption(theme);
+		await expect(page.locator('#legal-preview-container')).toHaveClass(new RegExp(theme));
+	}
+});
+
 test('numbered paragraphs toggle adds class', async ({ page }) => {
 	await gotoReady(page);
 	await page.locator('#markdown-input').fill('Primeiro.\n\nSegundo.\n\nTerceiro.');
