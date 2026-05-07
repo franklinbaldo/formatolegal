@@ -2,7 +2,7 @@
 	import apelacaoTemplate from '../templates/apelacao.md?raw';
 	import contestacaoTemplate from '../templates/contestacao.md?raw';
 
-	let { content = $bindable(), onTemplate } = $props();
+	let { content = $bindable(), onTemplate, isHidden = false } = $props();
 
 	const templates: Record<string, string> = {
 		apelacao: apelacaoTemplate,
@@ -42,7 +42,7 @@
 	}
 </script>
 
-<div class="editor-pane" ondragover={handleDragOver} ondragleave={handleDragLeave} ondrop={handleDrop}>
+<div class="editor-pane {isHidden ? 'mobile-hidden' : ''}" ondragover={handleDragOver} ondragleave={handleDragLeave} ondrop={handleDrop}>
 	<header class="pane-header">
 		<span>Markdown / Texto</span>
 		<select onchange={handleTemplateChange} aria-label="Modelos">

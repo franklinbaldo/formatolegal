@@ -2,6 +2,7 @@
 	import { onMount } from 'svelte';
 	import { renderMarkdown } from '../scripts/render';
 	import { STORAGE_KEYS, type Theme } from '../scripts/themes';
+	import { buildStandaloneHtml, downloadBlob } from '../scripts/download';
 	import Toolbar from './Toolbar.svelte';
 	import EditorPane from './EditorPane.svelte';
 	import PreviewPane from './PreviewPane.svelte';
@@ -10,6 +11,8 @@
 	let content = $state('');
 	let theme = $state<Theme>('theme-default');
 	let htmlContent = $state('');
+	let mobileTab = $state<'editor' | 'preview'>('editor');
+	let mounted = $state(false);
 
 	// Derived values (Sync rendering)
 	$effect(() => {
@@ -22,12 +25,16 @@
 		};
 		update();
 		
-		// Auto-save
-		localStorage.setItem(STORAGE_KEYS.content, content);
+		// Auto-save (only after mount to avoid clearing storage with initial empty string)
+		if (mounted) {
+			localStorage.setItem(STORAGE_KEYS.content, content);
+		}
 	});
 
 	$effect(() => {
-		localStorage.setItem(STORAGE_KEYS.theme, theme);
+		if (mounted) {
+			localStorage.setItem(STORAGE_KEYS.theme, theme);
+		}
 	});
 
 	onMount(() => {
@@ -36,6 +43,8 @@
 
 		const savedTheme = localStorage.getItem(STORAGE_KEYS.theme) as Theme;
 		if (savedTheme) theme = savedTheme;
+		
+		mounted = true;
 	});
 
 	function handlePrint() {
@@ -52,14 +61,10 @@
 		window.print();
 	}
 
-	function handleDownload() {
-		const blob = new Blob([htmlContent], { type: 'text/html' });
-		const url = URL.createObjectURL(blob);
-		const a = document.createElement('a');
-		a.href = url;
-		a.download = 'peticao.html';
-		a.click();
-		URL.revokeObjectURL(url);
+	async function handleDownload() {
+		const html = await buildStandaloneHtml(theme, htmlContent);
+		const blob = new Blob([html], { type: 'text/html' });
+		downloadBlob('peticao.html', blob);
 	}
 
 	function handleClear() {
@@ -86,8 +91,37 @@
 		onUpload={handleUpload}
 	/>
 	
+	<div class="pane-tabs" role="tablist" aria-label="Painéis">
+		<button
+			type="button"
+			role="tab"
+			aria-selected={mobileTab === 'editor'}
+			class={mobileTab !== 'editor' ? 'secondary outline' : ''}
+			onclick={() => (mobileTab = 'editor')}
+		>
+			Editor
+		</button>
+		<button
+			type="button"
+			role="tab"
+			aria-selected={mobileTab === 'preview'}
+			class={mobileTab !== 'preview' ? 'secondary outline' : ''}
+			onclick={() => (mobileTab = 'preview')}
+		>
+			Visualização
+		</button>
+	</div>
+
 	<div class="main-split">
-		<EditorPane bind:content={content} onTemplate={handleTemplate} />
-		<PreviewPane {htmlContent} {theme} />
+		<EditorPane 
+			bind:content={content} 
+			onTemplate={handleTemplate} 
+			isHidden={mobileTab !== 'editor'}
+		/>
+		<PreviewPane 
+			{htmlContent} 
+			{theme} 
+			isHidden={mobileTab !== 'preview'}
+		/>
 	</div>
 </div>

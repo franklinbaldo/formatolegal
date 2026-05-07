@@ -152,8 +152,8 @@
 	}
 }
 
-/* Print Handling */
-.page-container {
+/* Print Handling Mirror (hidden in app, shown in print) */
+body > .page-container {
 	display: none;
 }
 
@@ -161,11 +161,41 @@
 	.no-print {
 		display: none !important;
 	}
-	.page-container {
+	body > .page-container {
 		display: block !important;
 	}
 	body {
 		background: white !important;
 		padding: 0 !important;
+	}
+}
+
+/* Mobile Tabs */
+.pane-tabs {
+	display: none;
+	border-bottom: 1px solid #ddd;
+}
+
+.pane-tabs button {
+	flex: 1;
+	margin: 0;
+	border-radius: 0;
+	font-size: 12px;
+	padding: 8px;
+}
+
+@media (max-width: 900px) {
+	.pane-tabs {
+		display: flex;
+	}
+	.main-split {
+		flex-direction: column;
+	}
+	.editor-pane {
+		width: 100% !important;
+		border-right: none;
+	}
+	.mobile-hidden {
+		display: none !important;
 	}
 }
