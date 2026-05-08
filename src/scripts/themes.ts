@@ -1,7 +1,6 @@
-// Pull in every theme stylesheet as a side effect. The themes folder is the
-// registry of CSS files; this module is the registry of theme metadata.
-// Adding a theme = drop `<id>.css` in styles/themes and list `theme-<id>`
-// in THEMES below.
+// Eagerly side-effect-load every stylesheet in styles/themes/ so dropping
+// a new `<id>.css` there is enough to ship its styles. The THEMES array
+// below is independent: it controls what appears in the picker UI.
 void import.meta.glob('../styles/themes/*.css', { eager: true });
 
 export const THEMES = [
