@@ -1,7 +1,7 @@
 <script lang="ts">
-	import { onMount } from 'svelte';
+	import { onMount, tick } from 'svelte';
 	import { renderMarkdown } from '../scripts/render';
-	import { STORAGE_KEYS, type Theme, isTheme, safeLocalStorage } from '../scripts/themes';
+	import { STORAGE_KEYS, type Theme, isTheme } from '../scripts/themes';
 	import { buildStandaloneHtml, downloadBlob, copyHtmlToClipboard } from '../scripts/download';
 	import { pickRandom } from '../scripts/utils';
 	import Toolbar from './Toolbar.svelte';
@@ -69,7 +69,7 @@
 			if (!cancelled) htmlContent = rendered;
 		})();
 		if (mounted) {
-			safeLocalStorage.set(STORAGE_KEYS.content, current);
+			localStorage.setItem(STORAGE_KEYS.content, current);
 		}
 		return () => {
 			cancelled = true;
@@ -78,7 +78,7 @@
 
 	$effect(() => {
 		if (mounted) {
-			safeLocalStorage.set(STORAGE_KEYS.theme, theme);
+			localStorage.setItem(STORAGE_KEYS.theme, theme);
 		}
 	});
 
@@ -123,23 +123,20 @@
 	}
 
 	onMount(() => {
-		const savedContent = safeLocalStorage.get(STORAGE_KEYS.content);
+		const savedContent = localStorage.getItem(STORAGE_KEYS.content);
 		if (savedContent) content = savedContent;
-		const savedTheme = safeLocalStorage.get(STORAGE_KEYS.theme);
+		const savedTheme = localStorage.getItem(STORAGE_KEYS.theme);
 		if (savedTheme && isTheme(savedTheme)) theme = savedTheme;
 		privacyTooltip = pickRandom(PRIVACY_TOOLTIPS);
 		mounted = true;
 	});
 
 	async function handlePrint() {
-		htmlContent = await renderMarkdown(content);
-		const printArticle = document.getElementById('print-article');
-		if (printArticle) {
-			printArticle.innerHTML = htmlContent;
-			const container = printArticle.parentElement;
-			if (container) {
-				container.className = `page-container ${theme}`;
-			}
+		// Wait for the latest render to land in the preview before printing —
+		// the print target IS the preview, and the render effect is async.
+		if (content.trim()) {
+			htmlContent = await renderMarkdown(content);
+			await tick();
 		}
 		window.print();
 	}
@@ -168,7 +165,7 @@
 	}
 </script>
 
-<div class="editor-interface no-print" data-hydrated={mounted}>
+<div class="editor-interface" data-hydrated={mounted}>
 	<Toolbar
 		bind:theme={theme}
 		onPrint={handlePrint}

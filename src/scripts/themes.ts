@@ -53,24 +53,6 @@ export const STORAGE_KEYS = {
 	theme: 'formatolegal_theme',
 } as const;
 
-export const safeLocalStorage = {
-	get: (key: string): string | null => {
-		try {
-			return localStorage.getItem(key);
-		} catch (e) {
-			console.warn('LocalStorage access failed:', e);
-			return null;
-		}
-	},
-	set: (key: string, value: string): void => {
-		try {
-			localStorage.setItem(key, value);
-		} catch (e) {
-			console.warn('LocalStorage write failed:', e);
-		}
-	}
-};
-
 export function isTheme(value: string): value is Theme {
 	return (THEMES as readonly string[]).includes(value);
 }
