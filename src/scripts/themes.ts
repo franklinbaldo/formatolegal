@@ -1,3 +1,9 @@
+// Pull in every theme stylesheet as a side effect. The themes folder is the
+// registry of CSS files; this module is the registry of theme metadata.
+// Adding a theme = drop `<id>.css` in styles/themes and list `theme-<id>`
+// in THEMES below.
+void import.meta.glob('../styles/themes/*.css', { eager: true });
+
 export const THEMES = [
 	'theme-default',
 	'theme-classic',

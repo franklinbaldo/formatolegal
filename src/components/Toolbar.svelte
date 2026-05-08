@@ -12,17 +12,15 @@
 		privacyTooltip = 'Sua minuta não é enviada a servidores. Tudo roda no seu navegador.',
 	} = $props();
 
-	// eslint-disable-next-line no-undef
 	let menuDetails: HTMLDetailsElement | undefined = $state();
 
-	function handleFileChange(e: Event) {
-		const target = e.currentTarget as HTMLInputElement;
+	function handleFileChange(e: Event & { currentTarget: HTMLInputElement }) {
+		const target = e.currentTarget;
 		const file = target.files?.[0];
 		if (!file) return;
 		const reader = new FileReader();
-		// eslint-disable-next-line no-undef
-		reader.onload = (e: ProgressEvent<FileReader>) => {
-			if (typeof e.target?.result === 'string') onUpload(e.target.result);
+		reader.onload = (ev: ProgressEvent<FileReader>) => {
+			if (typeof ev.target?.result === 'string') onUpload(ev.target.result);
 		};
 		reader.readAsText(file);
 		target.value = '';
