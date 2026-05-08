@@ -1,14 +1,13 @@
 <script lang="ts">
 	import { paginate } from '../scripts/paginate';
+	import { countWords } from '../scripts/utils';
 
 	let { htmlContent, theme, isHidden = false } = $props();
 
 	let pages = $state<string[]>([]);
 	let resizeNonce = $state(0);
 
-	const wordCount = $derived(
-		htmlContent ? htmlContent.replace(/<[^>]*>/g, ' ').split(/\s+/).filter((w: string) => w.length > 0).length : 0
-	);
+	const wordCount = $derived(countWords(htmlContent));
 
 	$effect(() => {
 		// Re-paginate whenever content, theme, or window size changes.

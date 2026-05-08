@@ -171,6 +171,10 @@
 	flex-direction: column;
 	border-right: 1px solid var(--pico-muted-border-color);
 	background: var(--pico-card-background-color);
+	transition: background 120ms ease;
+}
+.editor-pane.drag-active {
+	background: #f0f7ff;
 }
 .editor-pane textarea {
 	flex: 1;

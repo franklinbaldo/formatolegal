@@ -39,8 +39,15 @@ function loadMermaid() {
 
 async function renderMermaid(html: string): Promise<string> {
 	if (!html.includes('language-mermaid')) return html;
-	const mermaid = await loadMermaid();
-	const doc = new DOMParser().parseFromString(`<div>${html}</div>`, 'text/html');
+	let mermaid: typeof import('mermaid').default;
+	let doc: Document;
+	try {
+		mermaid = await loadMermaid();
+		doc = new DOMParser().parseFromString(`<div>${html}</div>`, 'text/html');
+	} catch (err) {
+		console.error('Mermaid setup failed', err);
+		return html;
+	}
 	const blocks = doc.querySelectorAll('pre > code.language-mermaid');
 	for (const code of Array.from(blocks)) {
 		const id = `mermaid-${Math.random().toString(36).slice(2, 10)}`;
