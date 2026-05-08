@@ -17,35 +17,15 @@
 		peticao: peticaoTemplate,
 	};
 
-	const quickStart: { key: string; label: string; desc: string }[] = [
-		{ key: 'apelacao',    label: 'Apelação',         desc: 'Para quando a sentença saiu errada, obviamente.' },
-		{ key: 'contestacao', label: 'Contestação',      desc: 'Para rebater o que o outro lado inventou.' },
-		{ key: 'embargos',    label: 'Embargos',         desc: 'Para pedir que o óbvio fique explícito.' },
-		{ key: 'parecer',     label: 'Parecer',          desc: 'Opinião com fundamento legal. Pelo menos teoricamente.' },
-		{ key: 'contrato',    label: 'Contrato',         desc: 'Porque até o caos precisa de cláusulas.' },
-		{ key: 'peticao',     label: 'Petição simples',  desc: 'Para começar sem cerimônia.' },
-	];
-
-	let textareaEl: HTMLTextAreaElement;
 	let dragActive = $state(false);
 
 	function handleTemplateChange(e: Event & { currentTarget: HTMLSelectElement }) {
 		const target = e.currentTarget;
-		const val = target.value;
-		const tpl = templates[val];
+		const tpl = templates[target.value];
 		if (tpl) {
 			onTemplate(tpl);
 			target.value = '';
 		}
-	}
-
-	function loadQuickStart(key: string) {
-		const tpl = templates[key];
-		if (tpl) onTemplate(tpl);
-	}
-
-	function focusTextarea() {
-		textareaEl?.focus();
 	}
 
 	function handleDragOver(e: DragEvent) {
@@ -93,29 +73,9 @@
 		</select>
 	</header>
 
-	{#if !content}
-		<div class="quick-start">
-			<p class="quick-start-headline">Sua peça ainda está em branco.</p>
-			<p class="quick-start-sub">Cole uma minuta, escolha um padrão e veja a mágica jurídica acontecer.<br>Para protocolo, escolha <strong>CNJ/STF-STJ</strong>. Para caos controlado, escolha <strong>Petição Festa</strong>.</p>
-			<div class="quick-start-grid">
-				{#each quickStart as item (item.key)}
-					<button class="quick-start-card" onclick={() => loadQuickStart(item.key)}>
-						<span class="qs-label">{item.label}</span>
-						<span class="qs-desc">{item.desc}</span>
-					</button>
-				{/each}
-			</div>
-			<button class="secondary outline qs-paste-btn" onclick={focusTextarea}>
-				↓ Colar minha minuta
-			</button>
-		</div>
-	{/if}
-
 	<textarea
 		id="markdown-input"
-		bind:this={textareaEl}
 		bind:value={content}
 		placeholder="Cole seu Markdown aqui ou arraste um arquivo..."
-		class={!content ? 'textarea-compact' : ''}
 	></textarea>
 </div>

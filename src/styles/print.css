@@ -14,10 +14,26 @@
 		background: white !important;
 		padding: 0 !important;
 	}
+	/* Drop the editor chrome but keep the preview's page-container flowing */
+	.no-print,
+	.pane-tabs,
+	.pane-header,
+	.editor-pane { display: none !important; }
+	.editor-interface { position: static !important; height: auto !important; width: auto !important; display: block !important; }
+	.main-split { display: block !important; overflow: visible !important; }
+	.preview-pane,
+	.paper-viewport {
+		display: block !important;
+		background: white !important;
+		overflow: visible !important;
+		padding: 0 !important;
+	}
 	.page-container {
 		box-shadow: none !important;
 		margin: 0 !important;
 		width: 100% !important;
+		max-width: none !important;
+		padding: 0 !important;
 	}
 	hr {
 		border: none;
