@@ -163,11 +163,7 @@
 		setTimeout(() => (copyLabel = 'Copiar HTML'), COPY_LABEL_RESET_MS);
 	}
 
-	function handleUpload(text: string) {
-		content = text;
-	}
-
-	function handleTemplate(text: string) {
+	function setContent(text: string) {
 		content = text;
 	}
 </script>
@@ -180,7 +176,7 @@
 		onCopyHtml={handleCopyHtml}
 		{copyLabel}
 		onClear={handleClear}
-		onUpload={handleUpload}
+		onUpload={setContent}
 		onGavel={handleGavel}
 		{privacyTooltip}
 	/>
@@ -209,7 +205,7 @@
 	<div class="main-split">
 		<EditorPane
 			bind:content={content}
-			onTemplate={handleTemplate}
+			onTemplate={setContent}
 			isHidden={mobileTab !== 'editor'}
 		/>
 		<PreviewPane

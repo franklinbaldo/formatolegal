@@ -46,6 +46,8 @@ h4 {
 	color: var(--primary-color);
 	margin-top: 2em;
 	margin-bottom: 1em;
+	text-align: left;
+	hyphens: manual;
 }
 
 h2 {

@@ -26,6 +26,16 @@ const marked = new Marked()
 
 marked.use({ breaks: true, gfm: true });
 
+// Vite emits a preload `<link>` for the LegalEditor CSS chunk when it
+// dynamically imports mermaid. The referenced hashed file isn't always emitted
+// (Astro merges that CSS into another chunk), so the preload 404s and bubbles
+// up as a `vite:preloadError`, which mermaid then surfaces as a render error.
+// The CSS is already on the page via the layout's eager imports, so swallow
+// the false alarm. See vite-plugin/vite#11804.
+if (typeof window !== 'undefined') {
+	window.addEventListener('vite:preloadError', (e) => e.preventDefault());
+}
+
 let mermaidLoaded: Promise<typeof import('mermaid').default> | null = null;
 function loadMermaid() {
 	if (!mermaidLoaded) {
