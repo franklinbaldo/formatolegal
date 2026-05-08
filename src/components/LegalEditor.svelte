@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { onMount } from 'svelte';
+	import { onMount, tick } from 'svelte';
 	import { renderMarkdown } from '../scripts/render';
 	import { STORAGE_KEYS, type Theme, isTheme } from '../scripts/themes';
 	import { buildStandaloneHtml, downloadBlob, copyHtmlToClipboard } from '../scripts/download';
@@ -131,7 +131,13 @@
 		mounted = true;
 	});
 
-	function handlePrint() {
+	async function handlePrint() {
+		// Wait for the latest render to land in the preview before printing —
+		// the print target IS the preview, and the render effect is async.
+		if (content.trim()) {
+			htmlContent = await renderMarkdown(content);
+			await tick();
+		}
 		window.print();
 	}
 
