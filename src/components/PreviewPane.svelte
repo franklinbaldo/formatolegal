@@ -27,7 +27,7 @@
 		return () => window.removeEventListener('resize', onResize);
 	});
 
-	const pageCountLabel = $derived(pages.length || (htmlContent ? 1 : 1));
+	const pageCountLabel = $derived(pages.length || 1);
 
 	const pageSnark = $derived.by(() => {
 		const n = pages.length;
