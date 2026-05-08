@@ -27,18 +27,21 @@
 	];
 
 	let textareaEl: HTMLTextAreaElement;
+	let dragActive = $state(false);
 
-	function handleTemplateChange(e: Event) {
-		const target = e.currentTarget as HTMLSelectElement;
+	function handleTemplateChange(e: Event & { currentTarget: HTMLSelectElement }) {
+		const target = e.currentTarget;
 		const val = target.value;
-		if (val && templates[val]) {
-			onTemplate(templates[val]);
+		const tpl = templates[val];
+		if (tpl) {
+			onTemplate(tpl);
 			target.value = '';
 		}
 	}
 
 	function loadQuickStart(key: string) {
-		if (templates[key]) onTemplate(templates[key]);
+		const tpl = templates[key];
+		if (tpl) onTemplate(tpl);
 	}
 
 	function focusTextarea() {
@@ -47,35 +50,30 @@
 
 	function handleDragOver(e: DragEvent) {
 		e.preventDefault();
-		const el = e.currentTarget as HTMLElement;
-		el.style.background = '#f0f7ff';
+		dragActive = true;
 	}
 
-	function handleDragLeave(e: DragEvent) {
-		const el = e.currentTarget as HTMLElement;
-		el.style.background = 'white';
+	function handleDragLeave() {
+		dragActive = false;
 	}
 
 	function handleDrop(e: DragEvent) {
 		e.preventDefault();
-		const el = e.currentTarget as HTMLElement;
-		el.style.background = 'white';
+		dragActive = false;
 		const file = e.dataTransfer?.files[0];
-		if (file) {
-			const reader = new FileReader();
-			// eslint-disable-next-line no-undef
-			reader.onload = (e: ProgressEvent<FileReader>) => {
-				if (typeof e.target?.result === 'string') {
-					content = e.target.result;
-				}
-			};
-			reader.readAsText(file);
-		}
+		if (!file) return;
+		const reader = new FileReader();
+		reader.onload = (ev) => {
+			if (typeof ev.target?.result === 'string') {
+				content = ev.target.result;
+			}
+		};
+		reader.readAsText(file);
 	}
 </script>
 
 <div
-	class="editor-pane {isHidden ? 'mobile-hidden' : ''}"
+	class="editor-pane {isHidden ? 'mobile-hidden' : ''} {dragActive ? 'drag-active' : ''}"
 	ondragover={handleDragOver}
 	ondragleave={handleDragLeave}
 	ondrop={handleDrop}

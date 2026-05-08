@@ -3,9 +3,14 @@
 	import { renderMarkdown } from '../scripts/render';
 	import { STORAGE_KEYS, type Theme, isTheme, safeLocalStorage } from '../scripts/themes';
 	import { buildStandaloneHtml, downloadBlob, copyHtmlToClipboard } from '../scripts/download';
+	import { pickRandom } from '../scripts/utils';
 	import Toolbar from './Toolbar.svelte';
 	import EditorPane from './EditorPane.svelte';
 	import PreviewPane from './PreviewPane.svelte';
+
+	const CONFETTI_DURATION_MS = 3500;
+	const TOAST_DURATION_MS = 3000;
+	const COPY_LABEL_RESET_MS = 2200;
 
 	let content = $state('');
 	let theme = $state<Theme>('theme-default');
@@ -53,17 +58,22 @@
 	});
 
 	$effect(() => {
-		const update = async () => {
-			if (!content.trim()) {
+		const current = content;
+		let cancelled = false;
+		(async () => {
+			if (!current.trim()) {
 				htmlContent = '';
 				return;
 			}
-			htmlContent = await renderMarkdown(content);
-		};
-		update();
+			const rendered = await renderMarkdown(current);
+			if (!cancelled) htmlContent = rendered;
+		})();
 		if (mounted) {
-			safeLocalStorage.set(STORAGE_KEYS.content, content);
+			safeLocalStorage.set(STORAGE_KEYS.content, current);
 		}
+		return () => {
+			cancelled = true;
+		};
 	});
 
 	$effect(() => {
@@ -96,14 +106,14 @@
 		theme = 'theme-festa' as Theme;
 		confettiActive = true;
 		showToast('🎉 Modo Petição Festa ativado. Que comece o show!');
-		setTimeout(() => (confettiActive = false), 3500);
+		setTimeout(() => (confettiActive = false), CONFETTI_DURATION_MS);
 	}
 
 	function showToast(msg: string) {
 		toastMsg = msg;
 		setTimeout(() => {
 			if (toastMsg === msg) toastMsg = '';
-		}, 3000);
+		}, TOAST_DURATION_MS);
 	}
 
 	function handleGavel() {
@@ -117,7 +127,7 @@
 		if (savedContent) content = savedContent;
 		const savedTheme = safeLocalStorage.get(STORAGE_KEYS.theme);
 		if (savedTheme && isTheme(savedTheme)) theme = savedTheme;
-		privacyTooltip = PRIVACY_TOOLTIPS[Math.floor(Math.random() * PRIVACY_TOOLTIPS.length)];
+		privacyTooltip = pickRandom(PRIVACY_TOOLTIPS);
 		mounted = true;
 	});
 
@@ -149,8 +159,8 @@
 	async function handleCopyHtml() {
 		if (!htmlContent) return;
 		await copyHtmlToClipboard(htmlContent);
-		copyLabel = COPY_SUCCESS_MSGS[Math.floor(Math.random() * COPY_SUCCESS_MSGS.length)];
-		setTimeout(() => (copyLabel = 'Copiar HTML'), 2200);
+		copyLabel = pickRandom(COPY_SUCCESS_MSGS);
+		setTimeout(() => (copyLabel = 'Copiar HTML'), COPY_LABEL_RESET_MS);
 	}
 
 	function handleUpload(text: string) {

@@ -1,12 +1,12 @@
+import { stripHtml } from './utils';
+
 export async function copyHtmlToClipboard(articleHtml: string): Promise<void> {
 	if (!navigator.clipboard) return;
 	if (typeof ClipboardItem !== 'undefined' && navigator.clipboard.write) {
 		const blob = new Blob([articleHtml], { type: 'text/html' });
 		await navigator.clipboard.write([new ClipboardItem({ 'text/html': blob })]);
 	} else {
-		// Fallback: strip tags and copy plain text
-		const plain = articleHtml.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
-		await navigator.clipboard.writeText(plain);
+		await navigator.clipboard.writeText(stripHtml(articleHtml));
 	}
 }
 
