@@ -155,7 +155,7 @@
 
 	async function handleCopyHtml() {
 		if (!htmlContent) return;
-		await copyHtmlToClipboard(htmlContent);
+		await copyHtmlToClipboard(htmlContent, theme);
 		copyLabel = pickRandom(COPY_SUCCESS_MSGS);
 		setTimeout(() => (copyLabel = 'Copiar HTML'), COPY_LABEL_RESET_MS);
 	}

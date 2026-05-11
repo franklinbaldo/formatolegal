@@ -7,6 +7,8 @@
 	font-family: 'Times New Roman', Times, serif;
 	font-size: 12pt;
 	line-height: 1.5;
+	orphans: 3;
+	widows: 3;
 }
 .theme-abnt h1,
 .theme-abnt h2,

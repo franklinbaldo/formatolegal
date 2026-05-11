@@ -1,6 +1,8 @@
 /* Classic — Times New Roman tradicional. */
 .theme-classic {
 	font-family: 'Times New Roman', Times, serif;
+	orphans: 3;
+	widows: 3;
 }
 .theme-classic h1,
 .theme-classic h2,

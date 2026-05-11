@@ -79,3 +79,24 @@
 	font-weight: 700;
 	border: 2px solid #000;
 }
+
+/* Print override: borda 12px e h1 invertido viram tinta desperdiçada no papel. */
+@media print {
+	.theme-brutalist {
+		border: none !important;
+		box-shadow: none !important;
+	}
+	.theme-brutalist h1 {
+		background: #fff !important;
+		color: #000 !important;
+		border-bottom: 4px solid #000;
+		margin: 0 0 1em 0 !important;
+		padding: 0 !important;
+	}
+	.theme-brutalist strong {
+		background: transparent !important;
+		color: #000 !important;
+		padding: 0 !important;
+		text-decoration: underline;
+	}
+}

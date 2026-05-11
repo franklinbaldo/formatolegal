@@ -27,6 +27,7 @@
     "marked-emoji": "^2.0.3",
     "marked-footnote": "^1.4.0",
     "marked-highlight": "^2.2.4",
+    "marked-smartypants": "^1.1.12",
     "mermaid": "^11.14.0",
     "svelte": "^5.55.5"
   },

@@ -4,6 +4,7 @@ import markedFootnote from 'marked-footnote';
 import markedAlert from 'marked-alert';
 import { markedHighlight } from 'marked-highlight';
 import { markedEmoji } from 'marked-emoji';
+import { markedSmartypants } from 'marked-smartypants';
 import hljs from 'highlight.js';
 import { EMOJI_MAP } from './emoji-map';
 
@@ -22,9 +23,31 @@ const marked = new Marked()
 	)
 	.use(markedFootnote())
 	.use(markedAlert())
-	.use(markedEmoji({ emojis, renderer: (token) => token.emoji }));
+	.use(markedEmoji({ emojis, renderer: (token) => token.emoji }))
+	.use(markedSmartypants());
 
 marked.use({ breaks: true, gfm: true });
+
+// Insere espaço não-quebrável após abreviações jurídicas comuns para impedir
+// que "art. 5º", "§ 1º", "nº 123", "fl. 42", "inc. III" quebrem entre o
+// abreviativo e o número/inciso. Aplicado fora de tags e atributos.
+const NBSP_PATTERNS: Array<[RegExp, string]> = [
+	[/\b(arts?|artigos?)\.[ \t]+(?=\d|[IVXLCDM])/gi, '$1. '],
+	[/\b(incs?|incisos?)\.[ \t]+(?=\d|[IVXLCDM])/gi, '$1. '],
+	[/\b(§§?|parágrafos?)[ \t]+(?=\d|[IVXLCDM])/gi, '$1 '],
+	[/\b(n[oº°]s?\.?)[ \t]+(?=\d|[IVXLCDM])/gi, '$1 '],
+	[/\b(fls?|fls?\.|folhas?)[ \t]+(?=\d|[IVXLCDM])/gi, '$1 '],
+	[/\b(págs?|p\.|pp\.|páginas?)[ \t]+(?=\d|[IVXLCDM])/gi, '$1 '],
+	[/\b(caput|alínea|alíneas)[ \t]+(?=\d|[IVXLCDM])/gi, '$1 '],
+];
+
+function applyLegalNbsp(html: string): string {
+	return html.replace(/>([^<]+)</g, (_match, text) => {
+		let out = text as string;
+		for (const [re, sub] of NBSP_PATTERNS) out = out.replace(re, sub);
+		return `>${out}<`;
+	});
+}
 
 // Vite emits a preload `<link>` for the LegalEditor CSS chunk when it
 // dynamically imports mermaid. The referenced hashed file isn't always emitted
@@ -80,7 +103,8 @@ async function renderMermaid(html: string): Promise<string> {
 export async function renderMarkdown(raw: string): Promise<string> {
 	const html = await marked.parse(raw);
 	const withDiagrams = await renderMermaid(html);
-	return DOMPurify.sanitize(withDiagrams, {
+	const withNbsp = applyLegalNbsp(withDiagrams);
+	return DOMPurify.sanitize(withNbsp, {
 		USE_PROFILES: { html: true, svg: true, svgFilters: true, mathMl: true },
 		ADD_ATTR: ['target'],
 	});

@@ -94,6 +94,14 @@ li {
 .footer-signature {
 	margin-top: 60px;
 	text-align: center;
+	page-break-inside: avoid;
+	break-inside: avoid;
+}
+
+blockquote,
+li {
+	page-break-inside: avoid;
+	break-inside: avoid;
 }
 
 hr {

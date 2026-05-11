@@ -1,9 +1,15 @@
 import { stripHtml } from './utils';
 
-export async function copyHtmlToClipboard(articleHtml: string): Promise<void> {
+export async function copyHtmlToClipboard(
+	articleHtml: string,
+	themeClass?: string,
+): Promise<void> {
 	if (!navigator.clipboard) return;
+	const payload = themeClass
+		? await buildStandaloneHtml(themeClass, articleHtml)
+		: articleHtml;
 	if (typeof ClipboardItem !== 'undefined' && navigator.clipboard.write) {
-		const blob = new Blob([articleHtml], { type: 'text/html' });
+		const blob = new Blob([payload], { type: 'text/html' });
 		await navigator.clipboard.write([new ClipboardItem({ 'text/html': blob })]);
 	} else {
 		await navigator.clipboard.writeText(stripHtml(articleHtml));
