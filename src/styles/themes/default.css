@@ -1,5 +1,162 @@
-/* Default theme uses base typography (Lora/Montserrat) directly. */
-/* No overrides needed — this file is intentionally minimal. */
+/* Padrão Formato Legal — tipografia jurídica refinada.
+   Especificação: corpo 12pt, espaçamento 1,5, recuo 2cm no parágrafo,
+   recuo 4cm em citações, hierarquia de títulos 22/20/18/16/14/12pt,
+   uma linha em branco separando parágrafos. */
+
 .theme-default {
-	font-family: 'Lora', serif;
+	font-family: 'Lora', Georgia, 'Times New Roman', serif;
+	font-size: 12pt;
+	line-height: 1.5;
+	font-feature-settings: 'kern' 1, 'liga' 1, 'onum' 1;
+	text-rendering: optimizeLegibility;
+}
+
+/* Hierarquia de títulos — escala 12/14/16/18/20/22pt */
+.theme-default h1,
+.theme-default h2,
+.theme-default h3,
+.theme-default h4,
+.theme-default h5,
+.theme-default h6 {
+	font-family: 'Montserrat', 'Helvetica Neue', Arial, sans-serif;
+	color: var(--primary-color);
+	line-height: 1.25;
+	margin-top: 1.8em;
+	margin-bottom: 0.6em;
+	page-break-after: avoid;
+	break-after: avoid;
+	text-align: left;
+	hyphens: manual;
+}
+
+.theme-default h1 {
+	font-size: 22pt;
+	font-weight: 700;
+	text-align: center;
+	text-transform: uppercase;
+	letter-spacing: 0.02em;
+	margin-top: 0;
+	margin-bottom: 1.2em;
+	border: none;
+	padding: 0;
+}
+
+.theme-default h2 {
+	font-size: 20pt;
+	font-weight: 700;
+	text-transform: uppercase;
+	border-left: 4px solid var(--primary-color);
+	padding-left: 14px;
+}
+
+.theme-default h3 {
+	font-size: 18pt;
+	font-weight: 600;
+	color: #2a3a54;
+}
+
+.theme-default h4 {
+	font-size: 16pt;
+	font-weight: 600;
+	color: #2a3a54;
+}
+
+.theme-default h5 {
+	font-size: 14pt;
+	font-weight: 600;
+	font-style: italic;
+	color: #2a3a54;
+}
+
+.theme-default h6 {
+	font-size: 12pt;
+	font-weight: 700;
+	text-transform: uppercase;
+	letter-spacing: 0.04em;
+	color: #2a3a54;
+}
+
+/* Parágrafos: recuo 2cm, separados por uma linha em branco */
+.theme-default p {
+	text-indent: 2cm;
+	margin: 0 0 1em 0;
+	text-align: justify;
+	hyphens: auto;
+	orphans: 3;
+	widows: 3;
+}
+
+/* Primeiro parágrafo após título não recebe recuo (boa prática editorial) */
+.theme-default h1 + p,
+.theme-default h2 + p,
+.theme-default h3 + p,
+.theme-default h4 + p,
+.theme-default h5 + p,
+.theme-default h6 + p {
+	text-indent: 0;
+}
+
+/* Citações longas: recuo de 4cm, fonte 11pt, espaçamento simples (ABNT 10.520) */
+.theme-default blockquote {
+	margin: 1em 0 1em 4cm;
+	padding: 0;
+	border: none;
+	font-size: 11pt;
+	line-height: 1.2;
+	color: #2a2a2a;
+	text-align: justify;
+	hyphens: auto;
+}
+
+.theme-default blockquote p {
+	text-indent: 0;
+	margin-bottom: 0.5em;
+}
+
+/* Listas com recuo coerente */
+.theme-default ul,
+.theme-default ol {
+	margin: 0 0 1em 0;
+	padding-left: 2cm;
+}
+
+.theme-default li {
+	margin-bottom: 0.3em;
+	text-align: justify;
+}
+
+/* Ênfase: negrito mais escuro, itálico para termos jurídicos */
+.theme-default strong {
+	font-weight: 700;
+	color: #1a2a44;
+}
+
+.theme-default em {
+	font-style: italic;
+}
+
+/* Assinatura mais elegante */
+.theme-default .footer-signature {
+	margin-top: 4em;
+	text-align: center;
+	font-style: italic;
+}
+
+/* Tabelas discretas */
+.theme-default table {
+	border-collapse: collapse;
+	margin: 1em auto;
+	font-size: 11pt;
+}
+
+.theme-default th,
+.theme-default td {
+	border: 1px solid #bbb;
+	padding: 6px 10px;
+}
+
+.theme-default th {
+	background: #f4f6fa;
+	font-family: 'Montserrat', sans-serif;
+	font-weight: 600;
 }
