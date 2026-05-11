@@ -71,3 +71,32 @@
 	background: #0d0d12;
 	color: #00f0ff;
 }
+
+/* Print override: fundo escuro e text-shadow são ilegíveis no papel. */
+@media print {
+	.theme-cyberpunk,
+	.theme-cyberpunk h1,
+	.theme-cyberpunk h2,
+	.theme-cyberpunk h3,
+	.theme-cyberpunk h4,
+	.theme-cyberpunk strong,
+	.theme-cyberpunk a,
+	.theme-cyberpunk blockquote,
+	.theme-cyberpunk code {
+		background: #fff !important;
+		color: #000 !important;
+		text-shadow: none !important;
+		box-shadow: none !important;
+	}
+	.theme-cyberpunk h2::before {
+		color: #000 !important;
+		text-shadow: none !important;
+	}
+	.theme-cyberpunk blockquote {
+		border-left: 3px solid #000 !important;
+	}
+	.theme-cyberpunk hr {
+		border-top: 1px solid #000 !important;
+		box-shadow: none !important;
+	}
+}

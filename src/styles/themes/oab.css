@@ -8,6 +8,8 @@
 	font-size: 12pt;
 	line-height: 1.5;
 	counter-reset: oab-section;
+	orphans: 3;
+	widows: 3;
 }
 .theme-oab h1,
 .theme-oab h2,

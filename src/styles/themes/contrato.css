@@ -7,6 +7,8 @@
 	font-family: 'Times New Roman', Times, serif;
 	font-size: 11pt;
 	line-height: 1.25;
+	orphans: 3;
+	widows: 3;
 }
 .theme-contrato h1,
 .theme-contrato h2,
